@@ -12,7 +12,7 @@ let bind = (elem, binds) => {
         let bind = elem.getAttribute('bind');
 
         if (bindFor) {
-            safePush(binds, bindFor, {values: [], fors: []}, 'fors', elem);
+            safePush(binds, bindFor, {values: [], fors: []}, 'fors', {elem, display: elem.style.display});
             elem.style.display = 'none';
         }
 
@@ -42,10 +42,10 @@ let processBind = (value, bind, scope) => {
             elem.innerHTML = newValue;
         });
 
-        bind.fors.forEach(elem => {
+        bind.fors.forEach(({elem, display}) => {
             for (let i = 0; i < newValue.length; i++) {
                 let eachElem = elem.cloneNode(true);
-                eachElem.style.display = '';
+                eachElem.style.display = display;
                 elem.insertAdjacentElement('afterend', eachElem);
             }
         });
@@ -55,7 +55,7 @@ let processBind = (value, bind, scope) => {
 // binds = {
 //     'a.b.c': {
 //         values: [elem1, elem2],
-//         fors: [elem3]
+//         fors: [{elem: elem3, display: 'block'}}]
 //     }
 // };
 
