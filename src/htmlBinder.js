@@ -1,7 +1,7 @@
-const {getProperty, setProperty, addWatcher} = require('./objScafolding');
+const {setProperty, addWatcher, safePush} = require('./objScafolding');
 
 let bindRoot = document => {
-    let binds = {values: {}, for: {}};
+    let binds = {};
     bind(document, binds);
     return processBinds(binds);
 };
@@ -12,13 +12,12 @@ let bind = (elem, binds) => {
         let bind = elem.getAttribute('bind');
 
         if (bindFor) {
-
+            safePush(binds, bindFor, {values: [], fors: []}, 'fors', elem);
+            elem.style.display = 'none';
         }
 
-        else if (bind) {
-            binds.values[bind] = binds.values[bind] || [];
-            binds.values[bind].push(elem);
-        }
+        else if (bind)
+            safePush(binds, bind, {values: [], fors: []}, 'values', elem);
     }
 
     for (let i = 0; i < elem.children.length; i++)
@@ -28,25 +27,35 @@ let bind = (elem, binds) => {
 
 let processBinds = binds => {
     let scope = {};
-    for (value in binds.values) {
-        processBindValue(value, binds.values[value], scope);
-    }
+
+    for (value in binds)
+        processBind(value, binds[value], scope);
+
     return scope;
 };
 
-let processBindValue = (value, elems, scope) => {
+let processBind = (value, bind, scope) => {
     setProperty(scope, value, '');
+
     addWatcher(scope, value, newValue => {
-        elems.forEach(elem => {
+        bind.values.forEach(elem => {
             elem.innerHTML = newValue;
+        });
+
+        bind.fors.forEach(elem => {
+            for (let i = 0; i < newValue.length; i++) {
+                let eachElem = elem.cloneNode(true);
+                eachElem.style.display = '';
+                elem.insertAdjacentElement('afterend', eachElem);
+            }
         });
     });
 };
 
 // binds = {
-//     values: {
-//         'x.y.z': [elem1],
-//         't': [elem3, elem4]
+//     'a.b.c': {
+//         values: [elem1, elem2],
+//         fors: [elem3]
 //     }
 // };
 

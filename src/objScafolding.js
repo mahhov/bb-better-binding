@@ -29,4 +29,13 @@ let addWatcher = (obj, path, handler) => {
     });
 };
 
-module.exports = {getProperty, setProperty, addWatcher};
+let safeInit = (obj, field, init) => {
+    obj[field] = obj[field] || init;
+};
+
+let safePush = (obj, field, init, array, item) => {
+    safeInit(obj, field, init);
+    obj[field][array].push(item);
+};
+
+module.exports = {getProperty, setProperty, addWatcher, safeInit, safePush};
