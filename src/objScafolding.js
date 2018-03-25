@@ -1,12 +1,3 @@
-let hasProperty = (obj, path) => {
-    let fields = path.split('.');
-    let lastField = fields.pop();
-    fields.forEach(field => {
-        obj = obj[field] = obj[field] || {};
-    });
-    return obj[lastField];
-};
-
 let getProperty = (obj, path) => {
     let fields = path.split('.');
     let lastField = fields.pop();
@@ -16,29 +7,18 @@ let getProperty = (obj, path) => {
     return [obj, lastField];
 };
 
+let getValue = (obj, path) => {
+    let property = getProperty(obj, path);
+    return property[0][property[1]];
+};
+
 let setProperty = (obj, path, value) => {
     let property = getProperty(obj, path);
     property[0][property[1]] = value;
-};
-
-let addWatcher = (obj, path, handler) => {
-    let property = getProperty(obj, path);
-    let value = property[0][property[1]];
-
-    Object.defineProperty(property[0], property[1], {
-        get: () => value,
-
-        set: (newValue) => {
-            if (value !== newValue) {
-                handler(newValue);
-                value = newValue;
-            }
-        }
-    });
 };
 
 let safeInit = (obj, field, init) => {
     obj[field] = obj[field] || init;
 };
 
-module.exports = {hasProperty, getProperty, setProperty, addWatcher, safeInit};
+module.exports = {getProperty, getValue, setProperty, safeInit};

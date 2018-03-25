@@ -1,19 +1,20 @@
-const {hasProperty, setProperty, addWatcher, safeInit} = require('./objScafolding');
+const {setProperty, safeInit} = require('./objScafolding');
+const {createScope} = require('./scope');
 
 let bindRoot = document => {
     let binds = {};
-    let scope = {};
-    bindElem(document, binds, scope);
+    let {scope, handlers} = createScope();
+    bindElem(document, binds, scope, handlers);
     return scope;
 };
 
-let bindElem = (elem, binds, scope) => {
+let bindElem = (elem, binds, scope, handlers) => {
     if (elem.getAttribute) {
         let bindFor = elem.getAttribute('bind-for');
         let bindValue = elem.getAttribute('bind');
 
         if (bindFor) {
-            createBind(bindFor, binds, scope);
+            createBind(bindFor, binds, scope, handlers);
             let container = document.createElement('div');
             elem.removeAttribute('bind-for');
             let outerHtml = elem.outerHTML;
@@ -22,37 +23,37 @@ let bindElem = (elem, binds, scope) => {
         }
 
         else if (bindValue) {
-            createBind(bindValue, binds, scope);
+            createBind(bindValue, binds, scope, handlers);
             binds[bindValue].values.push(elem);
         }
     }
 
     for (let i = 0; i < elem.children.length; i++)
-        bindElem(elem.children[i], binds, scope);
+        bindElem(elem.children[i], binds, scope, handlers);
 };
 
-let createBind = (bindName, binds, scope) => {
+let createBind = (bindName, binds, scope, handlers) => {
     if (binds[bindName])
         return;
 
-    setProperty(scope, bindName, '');
+    setProperty(scope, bindName, null);
 
     let bind = {values: [], fors: []};
     safeInit(binds, bindName, bind);
 
-    addWatcher(scope, bindName, newValue => {
+    setProperty(handlers, bindName, value => {
         bind.values.forEach(elem => {
-            elem.innerHTML = newValue;
+            elem.innerHTML = value;
         });
 
         bind.fors.forEach(({container, outerHtml}) => {
-            removeAllChildren(container);
-            for (let i = 0; i < newValue.length; i++) {
-                let childElem = document.createElement('div');
-                childElem.innerHTML = outerHtml;
-                bindElem(childElem, binds, scope);
-                container.appendChild(childElem);
-            }
+            // removeAllChildren(container);
+            // for (let i = 0; i < value.length; i++) {
+            //     let childElem = document.createElement('div');
+            //     childElem.innerHTML = outerHtml;
+            //     bindElem(childElem, binds, scope);
+            //     container.appendChild(childElem);
+            // }
         });
     });
 
