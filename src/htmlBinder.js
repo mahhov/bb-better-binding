@@ -43,7 +43,7 @@ let createBind = (bindName, binds, source, handlers) => {
 
     setProperty(handlers, [bindName, '_func_'], value => {
         bind.values.forEach(elem => {
-            elem.innerHTML = value;
+            elem.innerHTML = value || null;
         });
 
         bind.fors.forEach(({container, outerHtml}) => {
@@ -77,6 +77,17 @@ let removeAllChildren = elem => {
 //     a: {
 //         b: {
 //             c: {}
+//         }
+//     }
+// };
+//
+// handlers = {
+//     a: {
+//         _func_: 'func',
+//         b: {
+//             c: {
+//                 _func_: 'func'
+//             }
 //         }
 //     }
 // };
