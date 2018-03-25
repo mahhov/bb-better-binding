@@ -47,13 +47,13 @@ let createBind = (bindName, binds, scope, handlers) => {
         });
 
         bind.fors.forEach(({container, outerHtml}) => {
-            // removeAllChildren(container);
-            // for (let i = 0; i < value.length; i++) {
-            //     let childElem = document.createElement('div');
-            //     childElem.innerHTML = outerHtml;
-            //     bindElem(childElem, binds, scope);
-            //     container.appendChild(childElem);
-            // }
+            removeAllChildren(container);
+            for (let i = 0; i < value.length; i++) {
+                let childElem = document.createElement('div');
+                childElem.innerHTML = outerHtml;
+                bindElem(childElem, binds, scope);
+                container.appendChild(childElem);
+            }
         });
     });
 
