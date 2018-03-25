@@ -17,13 +17,27 @@ let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
     set: (target, prop, value) => {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
-            if (handlers && typeof handlers[prop] === 'function')
-                handlers[prop](value);
-            else if (typeof arrayHandler === 'function')
+
+            if (handlers)
+                propogateHandlerDown(handlers[prop], value);
+
+            if (typeof arrayHandler === 'function')
                 arrayHandler(obj);
         }
         return true;
     }
 });
+
+let propogateHandlerDown = (handlers, value) => {
+    if (!handlers || !value)
+        return;
+
+    if (typeof handlers === 'function')
+        handlers(value);
+    else
+        for (key in handlers)
+            if (value[key])
+                propogateHandlerDown(handlers[key], value[key]);
+};
 
 module.exports = {createSource};
