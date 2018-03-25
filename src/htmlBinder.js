@@ -1,4 +1,4 @@
-const {setProperty, safeInit} = require('./objScafolding');
+const {getValue, setProperty, safeInit} = require('./objScafolding');
 const {createScope} = require('./scope');
 
 let bindRoot = document => {
@@ -25,6 +25,7 @@ let bindElem = (elem, binds, scope, handlers) => {
         else if (bindValue) {
             createBind(bindValue, binds, scope, handlers);
             binds[bindValue].values.push(elem);
+            getValue(handlers, bindValue)(getValue(scope, bindValue));
         }
     }
 
@@ -51,7 +52,7 @@ let createBind = (bindName, binds, scope, handlers) => {
             for (let i = 0; i < value.length; i++) {
                 let childElem = document.createElement('div');
                 childElem.innerHTML = outerHtml;
-                bindElem(childElem, binds, scope);
+                bindElem(childElem, binds, scope, handlers);
                 container.appendChild(childElem);
             }
         });
