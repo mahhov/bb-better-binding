@@ -23,7 +23,6 @@ source.w.y = 3;
 window.source = source;
 
 // todo
-// wrap htmlBinder inside class
 // expand html bind options for bind-if, bind-as and sharing bind-for & bind
 // allow inline binding: `{{x}}`
 // allow array binding in html: `bind="x[0]"` and `bind="x[y]"`
