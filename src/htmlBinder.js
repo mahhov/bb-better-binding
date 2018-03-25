@@ -14,19 +14,24 @@ let bindElem = (elem, binds, source, handlers) => {
         let bindValue = elem.getAttribute('bind');
 
         if (bindFor) {
-            createBind(bindFor, binds, source, handlers);
-            let container = document.createElement('div');
-            elem.removeAttribute('bind-for');
-            let outerHtml = elem.outerHTML;
-            binds[bindFor].fors.push({container, outerHtml});
-            elem.replaceWith(container);
+            bindFor = bindFor.split(' in ');
+            if (bindFor.length === 1) {
+                createBind(bindFor[0], binds, source, handlers);
+                let container = document.createElement('div');
+                elem.removeAttribute('bind-for');
+                let outerHtml = elem.outerHTML;
+                binds[bindFor[0]].fors.push({container, outerHtml});
+                elem.replaceWith(container);
+            } else {
+                // todo support source mapping in for binds
+            }
         }
 
         else if (bindValue) {
             createBind(bindValue, binds, source, handlers);
             binds[bindValue].values.push(elem);
             let handler = getValue(handlers, [bindValue]);
-            handler && handler._func_ && handler._func_(getValue(source, [bindValue])); // todo propogate
+            handler && handler._func_ && handler._func_(getValue(source, [bindValue])); // todo propogate?
         }
     }
 

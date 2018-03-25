@@ -3,10 +3,7 @@
     <ul>
         <li bind="x.y"></li>
         <li bind="x.y.z"></li>
-        <li bind-for="x.y.z">
-            <span bind="w.y">hi</span>
-            <span bind="w">hi</span>
-        </li>
+        <li bind-for="ww in x.y.z" bind="ww"></li>
         <!--w in x.y.z-->
     </ul>
     <video>
