@@ -1,7 +1,7 @@
-let createScope = () => {
+let createSource = () => {
     let handlers = {};
-    let scope = createProxy({}, handlers);
-    return {scope, handlers};
+    let source = createProxy({}, handlers);
+    return {source, handlers};
 };
 
 let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
@@ -26,4 +26,4 @@ let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
     }
 });
 
-module.exports = {createScope};
+module.exports = {createSource};

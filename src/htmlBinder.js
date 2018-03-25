@@ -1,20 +1,20 @@
 const {getValue, setProperty, safeInit} = require('./objScafolding');
-const {createScope} = require('./scope');
+const {createSource} = require('./source');
 
 let bindRoot = document => {
     let binds = {};
-    let {scope, handlers} = createScope();
-    bindElem(document, binds, scope, handlers);
-    return scope;
+    let {source, handlers} = createSource();
+    bindElem(document, binds, source, handlers);
+    return source;
 };
 
-let bindElem = (elem, binds, scope, handlers) => {
+let bindElem = (elem, binds, source, handlers) => {
     if (elem.getAttribute) {
         let bindFor = elem.getAttribute('bind-for');
         let bindValue = elem.getAttribute('bind');
 
         if (bindFor) {
-            createBind(bindFor, binds, scope, handlers);
+            createBind(bindFor, binds, source, handlers);
             let container = document.createElement('div');
             elem.removeAttribute('bind-for');
             let outerHtml = elem.outerHTML;
@@ -23,21 +23,21 @@ let bindElem = (elem, binds, scope, handlers) => {
         }
 
         else if (bindValue) {
-            createBind(bindValue, binds, scope, handlers);
+            createBind(bindValue, binds, source, handlers);
             binds[bindValue].values.push(elem);
-            getValue(handlers, bindValue)(getValue(scope, bindValue));
+            getValue(handlers, bindValue)(getValue(source, bindValue));
         }
     }
 
     for (let i = 0; i < elem.children.length; i++)
-        bindElem(elem.children[i], binds, scope, handlers);
+        bindElem(elem.children[i], binds, source, handlers);
 };
 
-let createBind = (bindName, binds, scope, handlers) => {
+let createBind = (bindName, binds, source, handlers) => {
     if (binds[bindName])
         return;
 
-    setProperty(scope, bindName, null);
+    setProperty(source, bindName, null);
 
     let bind = {values: [], fors: []};
     safeInit(binds, bindName, bind);
@@ -52,7 +52,7 @@ let createBind = (bindName, binds, scope, handlers) => {
             for (let i = 0; i < value.length; i++) {
                 let childElem = document.createElement('div');
                 childElem.innerHTML = outerHtml;
-                bindElem(childElem, binds, scope, handlers);
+                bindElem(childElem, binds, source, handlers);
                 container.appendChild(childElem);
             }
         });
@@ -73,7 +73,7 @@ let removeAllChildren = elem => {
 //     }
 // };
 //
-// scope = {
+// source = {
 //     a: {
 //         b: {
 //             c: {}

@@ -1,12 +1,12 @@
-const scope = require('./htmlBinder')(document);
-scope.x.y.z = [1, 2, 3];
-scope.w = 3;
+const source = require('./htmlBinder')(document);
+source.x.y.z = [1, 2, 3];
+source.w = 3;
 
-// scope.x.y.z.push(6);
+// source.x.y.z.push(6);
 
-// scope.x.y.z = [1, 2, 3];
+// source.x.y.z = [1, 2, 3];
 
-// scope.x.y = {z: [1, 2]};
+// source.x.y = {z: [1, 2]};
 
 // todo
 // pushing to array
@@ -14,13 +14,12 @@ scope.w = 3;
 // assigining to parent obj
 // nested for
 
-window.scope = scope;
+window.source = source;
 
 // todo
-// rename scope -> source
 // wrap htmlBinder inside class
-// propogate changes down scope
+// propogate changes down source
 // expand html bind options for bind-if, bind-as and sharing bind-for & bind
 // allow inline binding
 // allow array binding in html
-// initialize scope as null
+// initialize source as null
