@@ -1,6 +1,6 @@
 const source = require('./htmlBinder')(document);
-source.x.y.z = [1, 2, 3];
-source.w = 3;
+// source.x.y.z = [1, 2, 3];
+// source.w = 3;
 
 // source.x.y.z.push(6);
 
@@ -22,4 +22,4 @@ window.source = source;
 // expand html bind options for bind-if, bind-as and sharing bind-for & bind
 // allow inline binding
 // allow array binding in html
-// initialize source as null
+// handler functions assigned to _func_ to allow for observing multi level
