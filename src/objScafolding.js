@@ -1,5 +1,5 @@
-let getProperty = (obj, path) => {
-    let fields = path.split('.');
+let getProperty = (obj, paths) => {
+    let fields = getFields(paths);
     let lastField = fields.pop();
     fields.forEach(field => {
         if (!obj[field])
@@ -9,13 +9,13 @@ let getProperty = (obj, path) => {
     return [obj, lastField];
 };
 
-let getValue = (obj, path) => {
-    let property = getProperty(obj, path);
+let getValue = (obj, paths) => {
+    let property = getProperty(obj, paths);
     return property[0][property[1]];
 };
 
-let createProperty = (obj, path) => {
-    let fields = path.split('.');
+let createProperty = (obj, paths) => {
+    let fields = getFields(paths);
     let lastField = fields.pop();
     fields.forEach(field => {
         obj = obj[field] = obj[field] || {};
@@ -23,8 +23,8 @@ let createProperty = (obj, path) => {
     return [obj, lastField];
 };
 
-let setProperty = (obj, path, value) => {
-    let property = createProperty(obj, path);
+let setProperty = (obj, paths, value) => {
+    let property = createProperty(obj, paths);
     property[0][property[1]] = value;
 };
 
@@ -36,5 +36,8 @@ let safeInitPath = (obj, path, init) => {
     let property = creaetProperty(obj, path);
     property[0][property[1]] = property[0][property[1]] || init;
 };
+
+let getFields = paths =>
+    paths.map(path => path.split('.')).reduce((aggregate, item) => aggregate.concat(item));
 
 module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath};

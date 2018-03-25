@@ -18,11 +18,7 @@ let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
 
-            if (handlers)
-                propogateHandlerDown(handlers[prop], value);
-
-            if (typeof arrayHandler === 'function')
-                arrayHandler(obj);
+            handlers && propogateHandlerDown(handlers[prop], value) || propogateHandlerDown(arrayHandler, obj);
         }
         return true;
     }
@@ -32,10 +28,11 @@ let propogateHandlerDown = (handlers, value) => {
     if (!handlers)
         return;
 
-    if (typeof handlers === 'function')
-        handlers(value);
-    else
-        for (key in handlers)
+    if (typeof handlers._func_ === 'function')
+        handlers._func_(value);
+
+    for (key in handlers)
+        if (key !== '_func_')
             propogateHandlerDown(handlers[key], value && value[key] || null);
 };
 

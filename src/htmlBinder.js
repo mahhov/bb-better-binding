@@ -25,8 +25,8 @@ let bindElem = (elem, binds, source, handlers) => {
         else if (bindValue) {
             createBind(bindValue, binds, source, handlers);
             binds[bindValue].values.push(elem);
-            let handler = getValue(handlers, bindValue);
-            handler && handler(getValue(source, bindValue));
+            let handler = getValue(handlers, [bindValue]);
+            handler && handler._func_ && handler._func_(getValue(source, [bindValue])); // todo propogate
         }
     }
 
@@ -41,7 +41,7 @@ let createBind = (bindName, binds, source, handlers) => {
     let bind = {values: [], fors: []};
     safeInit(binds, bindName, bind);
 
-    setProperty(handlers, bindName, value => {
+    setProperty(handlers, [bindName, '_func_'], value => {
         bind.values.forEach(elem => {
             elem.innerHTML = value;
         });
