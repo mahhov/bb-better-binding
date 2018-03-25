@@ -48,12 +48,13 @@ let createBind = (bindName, binds, source, handlers) => {
 
         bind.fors.forEach(({container, outerHtml}) => {
             removeAllChildren(container);
-            for (let i = 0; i < value.length; i++) {
-                let childElem = document.createElement('div');
-                childElem.innerHTML = outerHtml;
-                bindElem(childElem, binds, source, handlers);
-                container.appendChild(childElem);
-            }
+            if (value && value.length)
+                for (let i = 0; i < value.length; i++) {
+                    let childElem = document.createElement('div');
+                    childElem.innerHTML = outerHtml;
+                    bindElem(childElem, binds, source, handlers);
+                    container.appendChild(childElem);
+                }
         });
     });
 

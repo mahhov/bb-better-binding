@@ -27,4 +27,3 @@ window.source = source;
 // allow inline binding
 // allow array binding in html
 // handler functions assigned to _func_ to allow for observing multi level
-// propogate removing properties from source

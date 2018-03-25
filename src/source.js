@@ -29,15 +29,14 @@ let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
 });
 
 let propogateHandlerDown = (handlers, value) => {
-    if (!handlers || !value)
+    if (!handlers)
         return;
 
     if (typeof handlers === 'function')
         handlers(value);
     else
         for (key in handlers)
-            if (value[key])
-                propogateHandlerDown(handlers[key], value[key]);
+            propogateHandlerDown(handlers[key], value && value[key] || null);
 };
 
 module.exports = {createSource};
