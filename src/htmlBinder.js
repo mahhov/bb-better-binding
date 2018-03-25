@@ -51,7 +51,7 @@ class HtmlBinder {
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
             bind.values.forEach(elem => {
-                elem.innerHTML = value || null;
+                elem.innerHTML = value !== undefined ? value : null;
             });
 
             bind.fors.forEach(({container, outerHtml}) => {
