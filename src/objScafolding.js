@@ -1,3 +1,12 @@
+let hasProperty = (obj, path) => {
+    let fields = path.split('.');
+    let lastField = fields.pop();
+    fields.forEach(field => {
+        obj = obj[field] = obj[field] || {};
+    });
+    return obj[lastField];
+};
+
 let getProperty = (obj, path) => {
     let fields = path.split('.');
     let lastField = fields.pop();
@@ -11,7 +20,6 @@ let setProperty = (obj, path, value) => {
     let property = getProperty(obj, path);
     property[0][property[1]] = value;
 };
-
 
 let addWatcher = (obj, path, handler) => {
     let property = getProperty(obj, path);
@@ -33,9 +41,4 @@ let safeInit = (obj, field, init) => {
     obj[field] = obj[field] || init;
 };
 
-let safePush = (obj, field, init, array, item) => {
-    safeInit(obj, field, init);
-    obj[field][array].push(item);
-};
-
-module.exports = {getProperty, setProperty, addWatcher, safeInit, safePush};
+module.exports = {hasProperty, getProperty, setProperty, addWatcher, safeInit};
