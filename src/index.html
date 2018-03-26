@@ -1,16 +1,19 @@
 <div>
     <input/>
     <ul>
-        <li bind="x.y"></li>
-        <li bind="x.y.z"></li>
-        <li bind-for="ww in x.y.z">
-            <div>GROUP</div>
-            <div bind="ww"></div>
-            <div bind="ww"></div>
-            <!--<div bind="x.y.z"></div>-->
-            <div>END GROUP</div>
-        </li>
-        <!--w in x.y.z-->
+        <!--<li bind="x.y"></li>-->
+        <!--<li bind="x.y.z"></li>-->
+        <!--<li bind-for="ww in x.y.z">-->
+        <!--item: <span bind="ww.val"></span>-->
+        <!--item-o: <span bind="ww.o"></span>-->
+        <!--w: <span bind="w.y"></span>-->
+        <!--x.y.zz <span bind="x.y.z"></span>-->
+        <!--</li>-->
+
+        <div bind-for="item in list">
+            <span bind="list"></span>
+        </div>
+
     </ul>
     <video>
 

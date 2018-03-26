@@ -32,8 +32,8 @@ class HtmlBinder {
                 if (sourceAugmentValue === undefined) {
                     this.createBind(bindValue, sourceAugment);
                     this.binds[bindValue].values.push(elem);
-                    let handler = getValue(this.handlers, [bindValue]);
-                    handler && handler._func_ && handler._func_(getValue(this.source, [bindValue]));
+                    let value = getValue(this.source, [bindValue]);
+                    elem.innerHTML = HtmlBinder.notUndefined(value);
 
                 } else
                     elem.innerHTML = sourceAugmentValue;
@@ -53,7 +53,7 @@ class HtmlBinder {
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
             bind.values.forEach(elem => {
-                elem.innerHTML = value !== undefined ? value : null;
+                elem.innerHTML = HtmlBinder.notUndefined(value);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
@@ -75,6 +75,10 @@ class HtmlBinder {
     static removeAllChildren(elem) {
         while (elem.firstElementChild)
             elem.removeChild(elem.firstElementChild);
+    }
+
+    static notUndefined(value) {
+        return value !== undefined ? value : null;
     }
 }
 

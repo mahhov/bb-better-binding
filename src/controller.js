@@ -19,7 +19,8 @@ const source = require('./htmlBinder')(document);
 // source.w = 3;
 // source.w = {};
 // source.w.y = 3;
-source.x = {y: {z: [1, 2]}};
+// source.x.y.zz = [1, 2];
+// source.x.y.z = [{val: 10, o: 100}, {val: 12, o: 122}];
 
 window.source = source;
 
