@@ -1,4 +1,4 @@
-const {getValue, setProperty, safeInit} = require('./objScafolding');
+const {getValue, setProperty, safeInit, modify} = require('./objScafolding');
 const {createSource} = require('./source');
 
 class HtmlBinder {
@@ -8,17 +8,17 @@ class HtmlBinder {
         let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
-        this.bindElem(root);
+        this.bindElem(root, {});
     }
 
-    bindElem(elem) {
+    bindElem(elem, sourceAugment) {
         if (elem.getAttribute) {
             let bindFor = elem.getAttribute('bind-for');
             let bindValue = elem.getAttribute('bind');
 
             if (bindFor) {
                 let [sourceMap, bindName] = bindFor.split(' in ');
-                this.createBind(bindName);
+                this.createBind(bindName, sourceAugment);
                 let container = document.createElement('div');
                 elem.removeAttribute('bind-for');
                 let outerHtml = elem.outerHTML;
@@ -27,18 +27,24 @@ class HtmlBinder {
             }
 
             else if (bindValue) {
-                this.createBind(bindValue);
-                this.binds[bindValue].values.push(elem);
-                let handler = getValue(this.handlers, [bindValue]);
-                handler && handler._func_ && handler._func_(getValue(this.source, [bindValue])); // todo propogate?
+                let sourceAugmentValue = getValue(sourceAugment, [bindValue]);
+
+                if (sourceAugmentValue === undefined) {
+                    this.createBind(bindValue, sourceAugment);
+                    this.binds[bindValue].values.push(elem);
+                    let handler = getValue(this.handlers, [bindValue]);
+                    handler && handler._func_ && handler._func_(getValue(this.source, [bindValue]));
+
+                } else
+                    elem.innerHTML = sourceAugmentValue;
             }
         }
 
         for (let i = 0; i < elem.children.length; i++)
-            this.bindElem(elem.children[i]);
+            this.bindElem(elem.children[i], sourceAugment);
     }
 
-    createBind(bindName) {
+    createBind(bindName, sourceAugment) {
         if (this.binds[bindName])
             return;
 
@@ -53,10 +59,11 @@ class HtmlBinder {
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
                 HtmlBinder.removeAllChildren(container);
                 if (value && value.length)
-                    value.forEach(() => {
+                    value.forEach(valueItem => {
                         let childElem = document.createElement('div');
                         childElem.innerHTML = outerHtml;
-                        // this.bindElem(childElem);
+                        let sourceAugmentModified = modify(sourceAugment, sourceMap, valueItem);
+                        this.bindElem(childElem, sourceAugmentModified);
                         container.appendChild(childElem);
                     });
             });

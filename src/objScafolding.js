@@ -37,7 +37,13 @@ let safeInitPath = (obj, path, init) => {
     property[0][property[1]] = property[0][property[1]] || init;
 };
 
+let modify = (original, key, value) => {
+    let modified = Object.assign({}, original);
+    modified[key] = value;
+    return modified
+};
+
 let getFields = paths =>
     paths.map(path => path.split('.')).reduce((aggregate, item) => aggregate.concat(item));
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath};
+module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, modify};
