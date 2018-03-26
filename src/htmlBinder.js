@@ -3,12 +3,12 @@ const {createSource} = require('./source');
 
 class HtmlBinder {
 
-    constructor(document) {
+    constructor(root) {
         this.binds = {};
         let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
-        this.bindElem(document);
+        this.bindElem(root);
     }
 
     bindElem(elem) {
@@ -17,21 +17,17 @@ class HtmlBinder {
             let bindValue = elem.getAttribute('bind');
 
             if (bindFor) {
-                bindFor = bindFor.split(' in ');
-                if (bindFor.length === 1) {
-                    this.createBind(bindFor[0], this.binds, this.source, this.handlers);
-                    let container = document.createElement('div');
-                    elem.removeAttribute('bind-for');
-                    let outerHtml = elem.outerHTML;
-                    this.binds[bindFor[0]].fors.push({container, outerHtml});
-                    elem.replaceWith(container);
-                } else {
-                    // todo support source mapping in for-binds
-                }
+                let [sourceMap, bindName] = bindFor.split(' in ');
+                this.createBind(bindName);
+                let container = document.createElement('div');
+                elem.removeAttribute('bind-for');
+                let outerHtml = elem.outerHTML;
+                this.binds[bindName].fors.push({container, outerHtml, sourceMap});
+                elem.replaceWith(container);
             }
 
             else if (bindValue) {
-                this.createBind(bindValue, this.binds, this.source, this.handlers);
+                this.createBind(bindValue);
                 this.binds[bindValue].values.push(elem);
                 let handler = getValue(this.handlers, [bindValue]);
                 handler && handler._func_ && handler._func_(getValue(this.source, [bindValue])); // todo propogate?
@@ -39,7 +35,7 @@ class HtmlBinder {
         }
 
         for (let i = 0; i < elem.children.length; i++)
-            this.bindElem(elem.children[i], this.binds, this.source, this.handlers);
+            this.bindElem(elem.children[i]);
     }
 
     createBind(bindName) {
@@ -54,22 +50,22 @@ class HtmlBinder {
                 elem.innerHTML = value !== undefined ? value : null;
             });
 
-            bind.fors.forEach(({container, outerHtml}) => {
-                this.removeAllChildren(container);
+            bind.fors.forEach(({container, outerHtml, sourceMap}) => {
+                HtmlBinder.removeAllChildren(container);
                 if (value && value.length)
-                    for (let i = 0; i < value.length; i++) {
+                    value.forEach(() => {
                         let childElem = document.createElement('div');
                         childElem.innerHTML = outerHtml;
-                        this.bindElem(childElem, this.binds, this.source, this.handlers);
+                        // this.bindElem(childElem);
                         container.appendChild(childElem);
-                    }
+                    });
             });
         });
 
         return bind;
     }
 
-    removeAllChildren(elem) {
+    static removeAllChildren(elem) {
         while (elem.firstElementChild)
             elem.removeChild(elem.firstElementChild);
     }
@@ -78,7 +74,7 @@ class HtmlBinder {
 // binds = {
 //     'a.b.c': {
 //         values: [elem1, elem2],
-//         fors: [{container, outerHtml}]
+//         fors: [{container, outerHtml, sourceMap}]
 //     }
 // };
 //
