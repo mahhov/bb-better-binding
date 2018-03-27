@@ -13,10 +13,22 @@ class HtmlBinder {
 
     bindElem(elem, sourceAugment) {
         if (elem.getAttribute) {
+            let bindIf = elem.getAttribute('bind-if');
             let bindFor = elem.getAttribute('bind-for');
             let bindValue = elem.getAttribute('bind');
 
-            if (bindFor) {
+            if (bindIf) {
+                let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
+
+                if (sourceAugmentValue === undefined) {
+                    this.createBind(bindIf, sourceAugment);
+                    this.binds[bindIf].ifs.push(elem);
+                    let value = getValue(this.source, [bindIf]);
+                    this.applyBindIf(elem, value);
+                } else
+                    this.applyBindIf(elem, sourceAugmentValue);
+
+            } else if (bindFor) {
                 let [sourceMap, bindName] = bindFor.split(' in ');
                 let sourceAugmentValue = getValue(sourceAugment, [bindName]);
                 let container = document.createElement('div');
@@ -54,24 +66,31 @@ class HtmlBinder {
         if (this.binds[bindName])
             return;
 
-        let bind = {values: [], fors: []};
+        let bind = {ifs: [], fors: [], values: []};
         safeInit(this.binds, bindName, bind);
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
-            bind.values.forEach(elem => {
-                this.applyBindValue(elem, value);
+            bind.ifs.forEach(elem => {
+                this.applyBindIf(elem, value);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
                 this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, value);
+            });
+
+            bind.values.forEach(elem => {
+                this.applyBindValue(elem, value);
             });
         });
 
         return bind;
     }
 
-    applyBindValue(elem, value) {
-        elem.innerHTML = HtmlBinder.notUndefined(value);
+    applyBindIf(elem, value) {
+        if (value)
+            elem.hidden = false;
+        else
+            elem.hidden = true;
     }
 
     applyBindFor(container, outerHtml, sourceMap, sourceAugment, value) {
@@ -84,6 +103,10 @@ class HtmlBinder {
                 this.bindElem(childElem, sourceAugmentModified);
                 container.appendChild(childElem);
             });
+    }
+
+    applyBindValue(elem, value) {
+        elem.innerHTML = HtmlBinder.notUndefined(value);
     }
 
     static removeAllChildren(elem) {
@@ -99,7 +122,8 @@ class HtmlBinder {
 // binds = {
 //     'a.b.c': {
 //         values: [elem1, elem2],
-//         fors: [{container, outerHtml, sourceMap}]
+//         fors: [{container, outerHtml, sourceMap}],
+//         ifs: [elem1, elem3]
 //     }
 // };
 //
