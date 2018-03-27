@@ -10,8 +10,18 @@
         <!--x.y.zz <span bind="x.y.z"></span>-->
         <!--</li>-->
 
-        <div bind-for="item in list">
-            <span bind="list"></span>
+        <div bind-for="ll in list">
+            <div bind-for="ll in list">
+                <div bind-for="l in ll.x">
+                    <div bind-for="l in ll.x">
+                        <span bind="l"></span>
+                        <!--l <span bind="l"></span>-->
+                        <!--ll.x <span bind="ll.x"></span>-->
+                        <!--list <span bind="list"></span>-->
+                        <!--ll <span bind="ll"></span>-->
+                    </div>
+                </div>
+            </div>
         </div>
 
     </ul>

@@ -18,12 +18,19 @@ class HtmlBinder {
 
             if (bindFor) {
                 let [sourceMap, bindName] = bindFor.split(' in ');
-                this.createBind(bindName, sourceAugment);
+                let sourceAugmentValue = getValue(sourceAugment, [bindName]);
                 let container = document.createElement('div');
+                elem.replaceWith(container);
                 elem.removeAttribute('bind-for');
                 let outerHtml = elem.outerHTML;
-                this.binds[bindName].fors.push({container, outerHtml, sourceMap});
-                elem.replaceWith(container);
+
+                if (sourceAugmentValue === undefined) {
+                    this.createBind(bindName, sourceAugment);
+                    this.binds[bindName].fors.push({container, outerHtml, sourceMap});
+                    let value = getValue(this.source, [bindName]);
+                    this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, value);
+                } else
+                    this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, sourceAugmentValue);
             }
 
             else if (bindValue) {
@@ -33,10 +40,9 @@ class HtmlBinder {
                     this.createBind(bindValue, sourceAugment);
                     this.binds[bindValue].values.push(elem);
                     let value = getValue(this.source, [bindValue]);
-                    elem.innerHTML = HtmlBinder.notUndefined(value);
-
+                    this.applyBindValue(elem, value);
                 } else
-                    elem.innerHTML = sourceAugmentValue;
+                    this.applyBindValue(elem, sourceAugmentValue);
             }
         }
 
@@ -53,23 +59,31 @@ class HtmlBinder {
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
             bind.values.forEach(elem => {
-                elem.innerHTML = HtmlBinder.notUndefined(value);
+                this.applyBindValue(elem, value);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
-                HtmlBinder.removeAllChildren(container);
-                if (value && value.length)
-                    value.forEach(valueItem => {
-                        let childElem = document.createElement('div');
-                        childElem.innerHTML = outerHtml;
-                        let sourceAugmentModified = modify(sourceAugment, sourceMap, valueItem);
-                        this.bindElem(childElem, sourceAugmentModified);
-                        container.appendChild(childElem);
-                    });
+                this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, value);
             });
         });
 
         return bind;
+    }
+
+    applyBindValue(elem, value) {
+        elem.innerHTML = HtmlBinder.notUndefined(value);
+    }
+
+    applyBindFor(container, outerHtml, sourceMap, sourceAugment, value) {
+        HtmlBinder.removeAllChildren(container);
+        if (value && value.length)
+            value.forEach(valueItem => {
+                let childElem = document.createElement('div');
+                childElem.innerHTML = outerHtml;
+                let sourceAugmentModified = modify(sourceAugment, sourceMap, valueItem);
+                this.bindElem(childElem, sourceAugmentModified);
+                container.appendChild(childElem);
+            });
     }
 
     static removeAllChildren(elem) {
