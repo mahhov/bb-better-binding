@@ -1,19 +1,8 @@
 <div>
     <input/>
     <ul>
-
-        <div bind-if="val" bind="val">
-            <div bind="val"></div>
+        <div bind-for="item in arr" bind-if="item" bind="item">
         </div>
-
-        <div bind-if="arr">
-            <div bind-for="item in arr">
-                <div bind-if="item">
-                    <div bind="item"></div>
-                </div>
-            </div>
-        </div>
-
     </ul>
     <video>
 

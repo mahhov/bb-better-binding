@@ -1,7 +1,7 @@
 const source = require('./htmlBinder')(document);
 
 source.val = 10;
-source.arr = [1, 0, 2, 3, false, true];
+source.arr = [0, 1, 2];
 
 window.source = source;
 

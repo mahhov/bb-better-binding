@@ -13,22 +13,11 @@ class HtmlBinder {
 
     bindElem(elem, sourceAugment) {
         if (elem.getAttribute) {
-            let bindIf = elem.getAttribute('bind-if');
             let bindFor = elem.getAttribute('bind-for');
+            let bindIf = elem.getAttribute('bind-if');
             let bindValue = elem.getAttribute('bind');
 
-            if (bindIf) {
-                let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
-
-                if (sourceAugmentValue === undefined) {
-                    this.createBind(bindIf, sourceAugment);
-                    this.binds[bindIf].ifs.push(elem);
-                    let value = getValue(this.source, [bindIf]);
-                    this.applyBindIf(elem, value);
-                } else
-                    this.applyBindIf(elem, sourceAugmentValue);
-
-            } else if (bindFor) {
+            if (bindFor) {
                 let [sourceMap, bindName] = bindFor.split(' in ');
                 let sourceAugmentValue = getValue(sourceAugment, [bindName]);
                 let container = document.createElement('div');
@@ -43,9 +32,20 @@ class HtmlBinder {
                     this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, value);
                 } else
                     this.applyBindFor(container, outerHtml, sourceMap, sourceAugment, sourceAugmentValue);
-            }
 
-            else if (bindValue) {
+            } else if (bindIf) {
+                let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
+                elem.removeAttribute('bind-if');
+
+                if (sourceAugmentValue === undefined) {
+                    this.createBind(bindIf, sourceAugment);
+                    this.binds[bindIf].ifs.push(elem);
+                    let value = getValue(this.source, [bindIf]);
+                    this.applyBindIf(elem, sourceAugment, value);
+                } else
+                    this.applyBindIf(elem, sourceAugment, sourceAugmentValue);
+
+            } else if (bindValue) {
                 let sourceAugmentValue = getValue(sourceAugment, [bindValue]);
 
                 if (sourceAugmentValue === undefined) {
@@ -71,7 +71,7 @@ class HtmlBinder {
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
             bind.ifs.forEach(elem => {
-                this.applyBindIf(elem, value);
+                this.applyBindIf(elem, sourceAugment, value);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
@@ -86,13 +86,6 @@ class HtmlBinder {
         return bind;
     }
 
-    applyBindIf(elem, value) {
-        if (value)
-            elem.hidden = false;
-        else
-            elem.hidden = true;
-    }
-
     applyBindFor(container, outerHtml, sourceMap, sourceAugment, value) {
         HtmlBinder.removeAllChildren(container);
         if (value && value.length)
@@ -103,6 +96,14 @@ class HtmlBinder {
                 this.bindElem(childElem, sourceAugmentModified);
                 container.appendChild(childElem);
             });
+    }
+
+    applyBindIf(elem, sourceAugment, value) {
+        if (value) {
+            elem.hidden = false;
+            this.bindElem(elem, sourceAugment);
+        } else
+            elem.hidden = true;
     }
 
     applyBindValue(elem, value) {
@@ -121,9 +122,9 @@ class HtmlBinder {
 
 // binds = {
 //     'a.b.c': {
-//         values: [elem1, elem2],
 //         fors: [{container, outerHtml, sourceMap}],
-//         ifs: [elem1, elem3]
+//         ifs: [elem1, elem3],
+//         values: [elem1, elem2]
 //     }
 // };
 //
