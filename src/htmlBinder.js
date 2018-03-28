@@ -112,7 +112,7 @@ class HtmlBinder {
     }
 
     static replaceInlineBindings(elem) {
-        elem.innerHTML = elem.innerHTML.replace(/([\\])?\${(\w+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`);
+        elem.innerHTML = elem.innerHTML.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`);
     }
 
     static removeAllChildren(elem) {
