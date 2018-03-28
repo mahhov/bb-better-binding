@@ -6,7 +6,6 @@ source.arr = [0, 1, 2];
 window.source = source;
 
 // todo
-// expand html bind options for bind-if, bind-component
+// html to support bind-component
 // allow array binding in html: `bind="x[0]"` and `bind="x[y]"`
-// nested for
 // garbage collect handler bindings for removed elements
