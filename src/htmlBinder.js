@@ -8,6 +8,7 @@ class HtmlBinder {
         let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
+        HtmlBinder.replaceInlineBindings(root.children[0]);
         this.bindElem(root, {});
     }
 
@@ -108,6 +109,10 @@ class HtmlBinder {
 
     applyBindValue(elem, value) {
         elem.innerHTML = HtmlBinder.notUndefined(value);
+    }
+
+    static replaceInlineBindings(elem) {
+        elem.innerHTML = elem.innerHTML.replace(/([\\])?\${(\w+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`);
     }
 
     static removeAllChildren(elem) {
