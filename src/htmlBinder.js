@@ -54,9 +54,9 @@ class HtmlBinder {
                     this.createBind(bindIf, sourceAugment, sourceLinks);
                     this.binds[bindIf].ifs.push(elem);
                     let value = getValue(this.source, [bindIf]);
-                    this.applyBindIf(elem, sourceAugment, value);
+                    this.applyBindIf(elem, value);
                 } else
-                    this.applyBindIf(elem, sourceAugment, sourceAugmentValue);
+                    this.applyBindIf(elem, sourceAugmentValue);
 
             } else if (bindValue) {
                 bindValue = translate(bindValue, sourceLinks);
@@ -85,7 +85,7 @@ class HtmlBinder {
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
             bind.ifs.forEach(elem => {
-                this.applyBindIf(elem, sourceAugment, value);
+                this.applyBindIf(elem, value);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
@@ -112,12 +112,8 @@ class HtmlBinder {
             });
     }
 
-    applyBindIf(elem, sourceAugment, value) {
-        if (value) {
-            elem.hidden = false;
-            this.bindElem(elem, sourceAugment);
-        } else
-            elem.hidden = true;
+    applyBindIf(elem, value) {
+        elem.hidden = !value;
     }
 
     applyBindValue(elem, value) {
