@@ -1,4 +1,4 @@
-const {getValue, setProperty, safeInit, modify} = require('./objScafolding');
+const {getValue, setProperty, safeInit, modify, indexToDot} = require('./objScafolding');
 const {createSource} = require('./source');
 
 class HtmlBinder {
@@ -14,9 +14,9 @@ class HtmlBinder {
 
     bindElem(elem, sourceAugment) {
         if (elem.getAttribute) {
-            let bindFor = elem.getAttribute('bind-for');
-            let bindIf = elem.getAttribute('bind-if');
-            let bindValue = elem.getAttribute('bind');
+            let bindFor = HtmlBinder.getBindAttribute(elem, 'bind-for');
+            let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
+            let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindFor) {
                 let [sourceMap, bindName] = bindFor.split(' in ');
@@ -122,6 +122,10 @@ class HtmlBinder {
 
     static notUndefined(value) {
         return value !== undefined ? value : null;
+    }
+
+    static getBindAttribute(elem, attribute) {
+        return indexToDot(elem.getAttribute(attribute));
     }
 }
 

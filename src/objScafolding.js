@@ -44,6 +44,10 @@ let modify = (original, key, value) => {
 };
 
 let getFields = paths =>
-    paths.map(path => path.split('.')).reduce((aggregate, item) => aggregate.concat(item));
+    paths
+        .map(path => path.split('.'))
+        .reduce((aggregate, item) => aggregate.concat(item));
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, modify};
+let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.${match}`);
+
+module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, modify, indexToDot};
