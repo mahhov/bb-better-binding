@@ -37,10 +37,21 @@ let safeInitPath = (obj, path, init) => {
     property[0][property[1]] = property[0][property[1]] || init;
 };
 
+let clone = original => {
+    let cloned = Object.assign({}, original);
+    return cloned;
+};
+
 let modify = (original, key, value) => {
     let modified = Object.assign({}, original);
     modified[key] = value;
     return modified
+};
+
+let translate = (name, links) => {
+    while (name in links)
+        name = links[name];
+    return name;
 };
 
 let getFields = paths =>
@@ -50,4 +61,4 @@ let getFields = paths =>
 
 let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.${match}`);
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, modify, indexToDot};
+module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot};
