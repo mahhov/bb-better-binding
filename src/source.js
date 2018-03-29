@@ -1,3 +1,5 @@
+const {notUndefined} = require('./objScafolding');
+
 let createSource = () => {
     let handlers = {};
     let source = createProxy({}, handlers);
@@ -33,7 +35,7 @@ let propogateHandlerDown = (handlers, value) => {
 
     for (key in handlers)
         if (key !== '_func_')
-            propogateHandlerDown(handlers[key], value && value[key] || null);
+            propogateHandlerDown(handlers[key], notUndefined(value && value[key]));
 };
 
 module.exports = {createSource};

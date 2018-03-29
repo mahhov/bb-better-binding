@@ -61,4 +61,7 @@ let getFields = paths =>
 
 let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.${match}`);
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot};
+let notUndefined = value =>
+    value !== undefined ? value : null;
+
+module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot, notUndefined};

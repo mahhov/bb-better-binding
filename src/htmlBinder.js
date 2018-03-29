@@ -1,4 +1,4 @@
-const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot} = require('./objScafolding');
+const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot, notUndefined} = require('./objScafolding');
 const {createSource} = require('./source');
 
 class HtmlBinder {
@@ -117,7 +117,7 @@ class HtmlBinder {
     }
 
     applyBindValue(elem, value) {
-        elem.innerHTML = HtmlBinder.notUndefined(value);
+        elem.innerHTML = notUndefined(value);
     }
 
     static replaceInlineBindings(elem) {
@@ -127,10 +127,6 @@ class HtmlBinder {
     static removeAllChildren(elem) {
         while (elem.firstElementChild)
             elem.removeChild(elem.firstElementChild);
-    }
-
-    static notUndefined(value) {
-        return value !== undefined ? value : null;
     }
 
     static getBindAttribute(elem, attribute) {

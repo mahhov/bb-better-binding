@@ -1,19 +1,9 @@
 <div>
-    <input/>
-    <ul>
-        <div bind-as="obj.long as short">long: <span bind="short"></span></div>
-        <div bind-as="obj.longArray as short">longArray: <span bind="short"></span></div>
-        <div bind-as="obj.longArray[0] as short">longArray[0]: <span bind="short"></span></div>
-        <div bind-as="obj.longArray.0 as short">longArray.0: <span bind="short"></span></div>
-        <div bind-as="obj.longObj as short">longObj: <span bind="short"></span></div>
-        <div bind-as="obj.longObj.key as short">longObj.key: <span bind="short"></span></div>
-        <div>short: <span bind="short"></span></div>
-    </ul>
-    <video>
-
-    </video>
-
-    <div bind-if="boolean"><span bind="bind"></span></div>
+    <div>should see `false` 4 times below:</div>
+    <div bind="x[0]"></div>
+    <div bind="x.0"></div>
+    <div bind="y"></div>
+    <div bind="z.z"></div>
 </div>
 
 <script>
