@@ -1,9 +1,15 @@
 <div>
-    <div>should see `false` 4 times below:</div>
-    <div bind="x[0]"></div>
-    <div bind="x.0"></div>
-    <div bind="y"></div>
-    <div bind="z.z"></div>
+    1
+    <div bind-use="comp1 with texts[0]"></div>
+    2
+    <div bind-use="comp1 with texts[1]"></div>
+    3
+    <div bind-use="comp1 with texts[0]"></div>
+</div>
+
+
+<div bind-component="comp1 with text  texts[3] texts[2]    thirdParam  fourthP">
+    message: ${text}
 </div>
 
 <script>

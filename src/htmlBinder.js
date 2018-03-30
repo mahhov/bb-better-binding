@@ -1,4 +1,4 @@
-const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot, notUndefined} = require('./objScafolding');
+const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
 const {createSource} = require('./source');
 
 class HtmlBinder {
@@ -8,28 +8,52 @@ class HtmlBinder {
         let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
+        this.components = {};
         HtmlBinder.replaceInlineBindings(root.children[0]);
         this.bindElem(root, {}, {});
     }
 
     bindElem(elem, sourceAugment, sourceLinks) {
         if (elem.getAttribute) {
+            let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
+            let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
             let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
             let bindFor = HtmlBinder.getBindAttribute(elem, 'bind-for');
             let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
-            if (bindAs) {
+            if (bindComponent) {
+                let [componentName, paramsGroup] = splitByWord(bindComponent, 'with');
+                let params = splitBySpace(paramsGroup);
+                elem.remove();
+                elem.removeAttribute('bind-component');
+                let outerHtml = elem.outerHTML;
+                this.components[componentName] = {outerHtml, params};
+
+            } else if (bindUse) {
+                let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
+                let paramsInput = splitBySpace(paramsGroup);
+                let {outerHtml, params} = this.components[componentName];
+                let componentElem = document.createElement('div');
+                componentElem.innerHTML = outerHtml;
+                elem.appendChild(componentElem);
+                sourceLinks = clone(sourceLinks);
+                params
+                    .forEach((to, index) => {
+                        sourceLinks[to] = paramsInput[index];
+                    });
+
+            } else if (bindAs) {
                 sourceLinks = clone(sourceLinks);
                 bindAs
-                    .split(/[,;]/)
-                    .map(as => as.split(/\s+as\s+/))
+                    .split(/[,;]/) // todo support whitespace
+                    .map(as => splitByWord(as, 'as'))
                     .forEach(([from, to]) => {
                         sourceLinks[to] = from;
                     });
 
             } else if (bindFor) {
-                let [sourceMap, bindName] = bindFor.split(/\s+in\s+/);
+                let [sourceMap, bindName] = splitByWord(bindFor, 'in');
                 bindName = translate(bindName, sourceLinks);
                 let sourceAugmentValue = getValue(sourceAugment, [bindName]);
                 let container = document.createElement('div');
@@ -48,7 +72,7 @@ class HtmlBinder {
             } else if (bindIf) {
                 bindIf = translate(bindIf, sourceLinks);
                 let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
-                elem.removeAttribute('bind-if');
+                elem.removeAttribute('bind-if'); // todo is this necessary
 
                 if (sourceAugmentValue === undefined) {
                     this.createBind(bindIf, sourceAugment, sourceLinks);
@@ -72,7 +96,7 @@ class HtmlBinder {
             }
         }
 
-        for (let i = 0; i < elem.children.length; i++)
+        for (let i = elem.children.length - 1; i >= 0; i--)
             this.bindElem(elem.children[i], sourceAugment, sourceLinks);
     }
 
@@ -158,6 +182,13 @@ class HtmlBinder {
 //                 _func_: 'func'
 //             }
 //         }
+//     }
+// };
+//
+// components = {
+//     a: {
+//         outerHtml: outerHtml,
+//         params: []
 //     }
 // };
 

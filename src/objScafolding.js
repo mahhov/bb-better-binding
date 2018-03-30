@@ -64,4 +64,10 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = value =>
     value !== undefined ? value : null;
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot, notUndefined};
+let splitByWord = (string, word) =>
+    string.split(new RegExp(`\\s+${word}\\s+`, 'g'));
+
+let splitBySpace = string =>
+    string.split(new RegExp(/\s+/, 'g'));
+
+module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace};

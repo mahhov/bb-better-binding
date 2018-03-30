@@ -1,8 +1,6 @@
 const source = require('./htmlBinder')(document);
 
-source.x = [false];
-source.y = false;
-source.z = {z: false};
+source.texts = ['1 line of text is good', 'but 2 lines r better'];
 
 window.source = source;
 
@@ -12,3 +10,5 @@ window.source = source;
 // garbage collect handler bindings for removed elements
 // name clashes with muleiple as's or as's & for's
 // clean up package.json
+// ${x} syntax to only affect inner text and not attributes
+// allow defining and using components in any order
