@@ -45,8 +45,7 @@ class HtmlBinder {
 
             } else if (bindAs) {
                 sourceLinks = clone(sourceLinks);
-                bindAs
-                    .split(/[,;]/) // todo support whitespace
+                splitByWord(bindAs, ',')
                     .map(as => splitByWord(as, 'as'))
                     .forEach(([from, to]) => {
                         sourceLinks[to] = from;

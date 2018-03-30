@@ -2,6 +2,10 @@ const source = require('./htmlBinder')(document);
 
 source.texts = ['1 line of text is good', 'but 2 lines r better'];
 
+source.x = 'xx';
+source.y = 'yy';
+source.z = 'zz';
+
 window.source = source;
 
 // todo
