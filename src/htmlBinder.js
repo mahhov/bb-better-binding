@@ -71,7 +71,6 @@ class HtmlBinder {
             } else if (bindIf) {
                 bindIf = translate(bindIf, sourceLinks);
                 let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
-                elem.removeAttribute('bind-if'); // todo is this necessary
 
                 if (sourceAugmentValue === undefined) {
                     this.createBind(bindIf, sourceAugment, sourceLinks);

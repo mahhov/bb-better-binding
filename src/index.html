@@ -4,6 +4,10 @@
     <div>${line3}</div>
 </div>
 
+<div bind-for="text in texts" bind-if="x">
+    x is truthy, ${text}
+</div>
+
 <div>
     1
     <div bind-use="comp1 with texts[0]"></div>
