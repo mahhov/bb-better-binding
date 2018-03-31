@@ -79,7 +79,7 @@ defines a reusable component named `banner` and with paramters `text` and `heade
 
 uses a component named `banner`, passing `source.bannerData.text` and `source.bannerData.header` as parameters
 
-### `bind-component-link="./component-definitions.html`
+### `bind-component-link="./component-definitions.html"`
 
 injects the contents of the relative path `./component-definitions.html`
 
