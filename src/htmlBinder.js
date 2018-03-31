@@ -1,5 +1,7 @@
+const fs = require('fs');
 const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
 const {createSource} = require('./source');
+const fileReader = require('./fileReader');
 
 class HtmlBinder {
 
@@ -15,6 +17,7 @@ class HtmlBinder {
 
     bindElem(elem, sourceAugment, sourceLinks) {
         if (elem.getAttribute) {
+            let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
             let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
             let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
             let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
@@ -22,7 +25,15 @@ class HtmlBinder {
             let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
-            if (bindComponent) {
+            if (bindComponentLink) {
+                let read = fileReader(bindComponentLink);
+                let loadedHtml = document.createElement('div');
+                loadedHtml.innerHTML = read;
+                HtmlBinder.replaceInlineBindings(loadedHtml);
+                elem.replaceWith(loadedHtml);
+                this.bindElem(loadedHtml, sourceAugment, sourceLinks);
+
+            } else if (bindComponent) {
                 let [componentName, paramsGroup] = splitByWord(bindComponent, 'with');
                 let params = splitBySpace(paramsGroup);
                 elem.remove();

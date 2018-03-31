@@ -1,26 +1,8 @@
-<div bind-as="x as line1 , y as line2 , z as line3">
-    <div>${line1}</div>
-    <div>${line2}</div>
-    <div>${line3}</div>
+<div bind-for="text in texts">
+    <div bind-use="notification with text"></div>
 </div>
 
-<div bind-for="text in texts" bind-if="x">
-    x is truthy, ${text}
-</div>
-
-<div>
-    1
-    <div bind-use="comp1 with texts[0]"></div>
-    2
-    <div bind-use="comp1 with texts[1]"></div>
-    3
-    <div bind-use="comp1 with texts[0]"></div>
-</div>
-
-
-<div bind-component="comp1 with text  texts[3] texts[2]    thirdParam  fourthP">
-    message: ${text}
-</div>
+<link bind-component-link="./components.html">
 
 <script>
     require('./controller');
