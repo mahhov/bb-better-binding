@@ -1,20 +1,12 @@
 {
-  "name": "local-yt",
+  "name": "bb-better-binding",
   "version": "0.0.1",
-  "description": "online & offline youtube streaming",
+  "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
-  "scripts": {
-    "start": "electron ."
-  },
   "author": "mahhov",
   "license": "ISC",
-  "dependencies": {
-    "axios": "^0.18.0",
-    "google-auth-library": "^1.3.2",
-    "googleapis": "^27.0.0",
-    "ytdl-core": "^0.20.2"
-  },
-  "devDependencies": {
-    "electron": "^1.8.4"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mahhov/bb-better-binding"
   }
 }

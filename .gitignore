@@ -1,4 +1,3 @@
 node_modules
 .idea
-src/experiment.js
-resources/*
+example/*

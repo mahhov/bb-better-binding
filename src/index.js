@@ -1,19 +1,11 @@
-const {app, BrowserWindow} = require('electron');
-const electron = require('electron');
+const htmlBinder = require('./htmlBinder');
 
-app.on('ready', () => {
-    const path = require('path');
-    const url = require('url');
+module.exports = root => htmlBinder(root);
 
-    let window = new BrowserWindow();
-
-    window.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true
-    }));
-
-    window.maximize();
-
-    window.toggleDevTools();
-});
+// todo
+// allow array binding in html: `bind="x[0]"` and `bind="x[y]"`
+// garbage collect handler bindings for removed elements
+// name clashes with muleiple as's or as's & for's
+// clean up package.json
+// ${x} syntax to only affect inner text and not attributes
+// allow defining and using components in any order
