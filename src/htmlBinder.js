@@ -5,17 +5,17 @@ const fileReader = require('./fileReader');
 
 class HtmlBinder {
 
-    constructor(root) {
+    constructor(dir, root) {
         this.binds = {};
         let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
         this.components = {};
         HtmlBinder.replaceInlineBindings(root.children[0]);
-        this.bindElem(root, {}, {});
+        this.bindElem(root, {}, {}, dir);
     }
 
-    bindElem(elem, sourceAugment, sourceLinks) {
+    bindElem(elem, sourceAugment, sourceLinks, linkBaseDir) {
         if (elem.getAttribute) {
             let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
             let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
@@ -26,12 +26,12 @@ class HtmlBinder {
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindComponentLink) {
-                let read = fileReader(bindComponentLink);
+                let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
                 let loadedHtml = document.createElement('div');
                 loadedHtml.innerHTML = read;
                 HtmlBinder.replaceInlineBindings(loadedHtml);
                 elem.replaceWith(loadedHtml);
-                this.bindElem(loadedHtml, sourceAugment, sourceLinks);
+                this.bindElem(loadedHtml, sourceAugment, sourceLinks, readDir);
 
             } else if (bindComponent) {
                 let [componentName, paramsGroup] = splitByWord(bindComponent, 'with');
@@ -72,19 +72,19 @@ class HtmlBinder {
                 let outerHtml = elem.outerHTML;
 
                 if (sourceAugmentValue === undefined) {
-                    this.createBind(bindName, sourceAugment, sourceLinks);
+                    this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
                     this.binds[bindName].fors.push({container, outerHtml, sourceMap});
                     let value = getValue(this.source, [bindName]);
-                    this.applyBindFor(container, outerHtml, sourceMap, value, sourceAugment);
+                    this.applyBindFor(container, outerHtml, sourceMap, value, sourceAugment, linkBaseDir);
                 } else
-                    this.applyBindFor(container, outerHtml, sourceMap, sourceAugmentValue, sourceAugment);
+                    this.applyBindFor(container, outerHtml, sourceMap, sourceAugmentValue, sourceAugment, linkBaseDir);
 
             } else if (bindIf) {
                 bindIf = translate(bindIf, sourceLinks);
                 let sourceAugmentValue = getValue(sourceAugment, [bindIf]);
 
                 if (sourceAugmentValue === undefined) {
-                    this.createBind(bindIf, sourceAugment, sourceLinks);
+                    this.createBind(bindIf, sourceAugment, sourceLinks, linkBaseDir);
                     this.binds[bindIf].ifs.push(elem);
                     let value = getValue(this.source, [bindIf]);
                     this.applyBindIf(elem, value);
@@ -96,7 +96,7 @@ class HtmlBinder {
                 let sourceAugmentValue = getValue(sourceAugment, [bindValue]);
 
                 if (sourceAugmentValue === undefined) {
-                    this.createBind(bindValue, sourceAugment, sourceLinks);
+                    this.createBind(bindValue, sourceAugment, sourceLinks, linkBaseDir);
                     this.binds[bindValue].values.push(elem);
                     let value = getValue(this.source, [bindValue]);
                     this.applyBindValue(elem, value);
@@ -106,10 +106,10 @@ class HtmlBinder {
         }
 
         for (let i = elem.children.length - 1; i >= 0; i--)
-            this.bindElem(elem.children[i], sourceAugment, sourceLinks);
+            this.bindElem(elem.children[i], sourceAugment, sourceLinks, linkBaseDir);
     }
 
-    createBind(bindName, sourceAugment, sourceLinks) {
+    createBind(bindName, sourceAugment, sourceLinks, linkBaseDir) {
         if (this.binds[bindName])
             return;
 
@@ -122,7 +122,7 @@ class HtmlBinder {
             });
 
             bind.fors.forEach(({container, outerHtml, sourceMap}) => {
-                this.applyBindFor(container, outerHtml, sourceMap, value, sourceAugment, sourceLinks);
+                this.applyBindFor(container, outerHtml, sourceMap, value, sourceAugment, sourceLinks, linkBaseDir);
             });
 
             bind.values.forEach(elem => {
@@ -133,14 +133,14 @@ class HtmlBinder {
         return bind;
     }
 
-    applyBindFor(container, outerHtml, sourceMap, value, sourceAugment, sourceLinks) {
+    applyBindFor(container, outerHtml, sourceMap, value, sourceAugment, sourceLinks, linkBaseDir) {
         HtmlBinder.removeAllChildren(container);
         if (value && value.length)
             value.forEach(valueItem => {
                 let childElem = document.createElement('div');
                 childElem.innerHTML = outerHtml;
                 let sourceAugmentModified = modify(sourceAugment, sourceMap, valueItem);
-                this.bindElem(childElem, sourceAugmentModified, sourceLinks);
+                this.bindElem(childElem, sourceAugmentModified, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
             });
     }
@@ -201,4 +201,4 @@ class HtmlBinder {
 //     }
 // };
 
-module.exports = document => new HtmlBinder(document).source;
+module.exports = (dir, document) => new HtmlBinder(dir, document).source;

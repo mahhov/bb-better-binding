@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
+  "scripts": {
+    "example": "electron example/index.js"
+  },
   "author": "mahhov",
   "license": "ISC",
   "repository": {
