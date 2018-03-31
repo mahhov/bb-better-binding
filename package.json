@@ -4,7 +4,8 @@
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
-    "example": "electron example/index.js"
+    "example": "electron example/index.js",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "author": "mahhov",
   "license": "ISC",
