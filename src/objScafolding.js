@@ -49,8 +49,13 @@ let modify = (original, key, value) => {
 };
 
 let translate = (name, links) => {
-    while (name in links)
+    let occured = [];
+    while (name in links) {
+        occured.push(name);
         name = links[name];
+        if (occured.includes(name))
+            return name;
+    }
     return name;
 };
 
