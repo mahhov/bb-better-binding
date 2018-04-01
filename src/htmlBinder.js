@@ -107,9 +107,9 @@ class HtmlBinder {
                 let attributes = elem.attributes;
                 for (let i = 0; i < attributes.length; i++) {
                     let {name, value} = attributes[i];
-                    let matches = value.match(/\${([\w.[\]]+)}/g);
-                    matches && matches.forEach(match => {
-                        let [, bindName] = match.match(/\${([\w.[\]]+)}/);
+                    let fieldMatches = value.match(/\$f?{([\w.[\]]+)}/g);
+                    fieldMatches && fieldMatches.forEach(match => {
+                        let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
                         this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
                         this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
                     });
@@ -171,13 +171,17 @@ class HtmlBinder {
     }
 
     applyBindAttributes(elem, name, value) {
-        let modifiedValue = value.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : notUndefined(getValue(this.source, [match]), ''));
-        console.log('set', name, 'from', value, 'to', modifiedValue);
+        let modifiedValue = value.replace(/(\\)?\$(f)?{([\w.[\]]+)}/g, (all, prefixSlash, prefixF, match) => {
+            if (prefixSlash)
+                return all;
+            let value = notUndefined(getValue(this.source, [match]), '');
+            return prefixF ? `(${value})()` : value;
+        });
         elem.setAttribute(name, modifiedValue);
     }
 
     static replaceInlineBindings(elem) {
-        // elem.innerHTML = elem.innerHTML.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo extract
+        elem.innerHTML = elem.innerHTML.replace(/(\\)?\$s{([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo similar regex expressions extract
     }
 
     static removeAllChildren(elem) {
