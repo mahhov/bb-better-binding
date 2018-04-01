@@ -16,14 +16,21 @@ run: `npm i -save bb-beter-binding`
         <div bind="num"></div>
     </div>
 </div>
+
+<input onchange="$f{changeHandler}"> </input>
 ```
 
 ### your `.js` controller
 
 ```js
 const source = require('bb-better-binding')(__dirname, document);
+
 source.showNumbers = true;
 source.numbers = [10, 12, 16, 13];
+
+source.changeHandler = () => {
+    console.log('stop changing things!!')
+};
 ```
 
 ## Components Example
@@ -39,8 +46,6 @@ source.numbers = [10, 12, 16, 13];
     <div style="color:${titleColor}; font-size:30px" bind="book"></div>
     <div>due on $s{date}</div>
 </div>
-
-<input onchange="$f{changeHandler}"> </input>
 ```
 
 ### your `.js` controller
@@ -54,10 +59,6 @@ source.overdueBooks = [{
 }];
 
 source.titleColor = "red";
-
-source.changeHandler = () => {
-    console.log('stop changing things!!')
-};
 ```
 
 ## HTML syntax
