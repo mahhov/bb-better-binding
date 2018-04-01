@@ -53,33 +53,52 @@ source.overdueBooks = [{
 
 ## HTML syntax
 
-### `bind="x"`
+### bind value
+
+`<span bind="x"> </span>`
 
 replaces the innerHtml of the element with `source.x`
 
-`$s{x}` is a shorthand for `<span bind="x"></span>`
+`$s{x}` is a shorthand for `<span bind="x"> </span>`
 
-### `bind-for="item in list"`
+### bind for
+
+`<span bind-for="item in list"> $s{item} </span>`
 
 repeats the element for each element in `source.list` and makes `item` available to all children elements
 
-### `bind-if="show"`
+### bind if
+
+`<span bind-if="show"> am i visible? </span>`
 
 sets the `hidden` property of the element
 
-### `bind-as="response.data.errorMessages[2].text as text`
+### bind as
+
+`<span bind-as="response.data.errorMessages[2].text as text> $s{text} </span>`
 
 makes `text` available to all children elements as a shortcut to `source.response.data.errorMessages[2].text`
 
-### `bind-component="banner with text header"` 
+### bind component 
+
+```
+<div bind-component="banner with text header">
+    <div style="font-size:50px" bind="header"> </div>
+    <div style="font-size:20px" bind="text"> </div>
+</div>
+``` 
 
 defines a reusable component named `banner` and with paramters `text` and `header`
 
-### `bind-use="banner with bannerData.text bannerData.header"` 
+### bind use
+
+`<div bind-use="banner with bannerData.text bannerData.header"> </div>` 
 
 uses a component named `banner`, passing `source.bannerData.text` and `source.bannerData.header` as parameters
 
-### `bind-component-link="./component-definitions.html"`
+### bind component link
+
+`<link bind-component-link="./component-definitions.html"> </link>`
 
 injects the contents of the relative path `./component-definitions.html`
 
@@ -87,11 +106,15 @@ injects the contents of the relative path `./component-definitions.html`
 
 Components are loaded from bottom of the document, upwards. This means, if `component-parent` uses `component-child`, then `component-child` should be loaded first (e.g. defined lower in the html). Similary, all usages of `component-parent` should occur after (e.g. higher in the html) the component than where it is defined. 
 
-### attribute binding, `name="box-number-${i}" style="color: ${favoriteColor}; font-size=${largeFont}"`
+### attribute binding
 
-binds `source.i` to the element name and `source.favoriteColor` and `source.largeFont` to the element's style attribute.
+`<div name="box-number-${i}" style="color: ${favoriteColor}; font-size=${largeFont}"> </div>`
 
-### function binding `onclick="$f{logHello}" onchange="$f{logWoah}"`
+binds `source.i` to the element name and `source.favoriteColor` and `source.largeFont` to the element's style attributes.
+
+### function binding
+
+`<input onclick="$f{logHello}" onchange="$f{logWoah}"> </input>`
 
 binds wrapped invocaters of the functions `source.logHello` and `source.logWoah` to the element's `onclick` and `onchange` attribute 
 
