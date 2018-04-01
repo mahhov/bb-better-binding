@@ -57,7 +57,7 @@ source.overdueBooks = [{
 
 replaces the innerHtml of the element with `source.x`
 
-`${x}` is a shorthand for `<span bind="x"></span>`
+`$s{x}` is a shorthand for `<span bind="x"></span>`
 
 ### `bind-for="item in list"`
 
@@ -86,3 +86,17 @@ injects the contents of the relative path `./component-definitions.html`
 #### Note on component load order
 
 Components are loaded from bottom of the document, upwards. This means, if `component-parent` uses `component-child`, then `component-child` should be loaded first (e.g. defined lower in the html). Similary, all usages of `component-parent` should occur after (e.g. higher in the html) the component than where it is defined. 
+
+### attribute binding, `name="box-number-${i}" style="color: ${favoriteColor}; font-size=${largeFont}"`
+
+binds `source.i` to the element name and `source.favoriteColor` and `source.largeFont` to the element's style attribute.
+
+### function binding `onclick="$f{logHello}" onchange="$f{logWoah}"`
+
+binds wrapped invocaters of the functions `source.logHello` and `source.logWoah` to the element's `onclick` and `onchange` attribute 
+
+for example, if `source.logHello = () => { console.log('hi') }`
+
+then sets element's onclick to `( () => { console.log('hello') } ) ()` 
+
+this is a convenience syntax for the equally valid `onclick="(${logHello)()"` syntax 
