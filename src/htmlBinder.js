@@ -25,6 +25,18 @@ class HtmlBinder {
             let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
+            let attributes = elem.attributes;
+            for (let i = 0; i < attributes.length; i++) {
+                let {name, value} = attributes[i];
+                let fieldMatches = value.match(/\$f?{([\w.[\]]+)}/g);
+                fieldMatches && fieldMatches.forEach(match => {
+                    let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
+                    this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
+                    this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                });
+                this.applyBindAttributes(elem, name, value);
+            }
+            
             if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
                 let loadedHtml = document.createElement('div');
@@ -103,18 +115,6 @@ class HtmlBinder {
                 } else
                     this.applyBindValue(elem, sourceAugmentValue);
 
-            } else { // todo allow using in parallel with other binds
-                let attributes = elem.attributes;
-                for (let i = 0; i < attributes.length; i++) {
-                    let {name, value} = attributes[i];
-                    let fieldMatches = value.match(/\$f?{([\w.[\]]+)}/g);
-                    fieldMatches && fieldMatches.forEach(match => {
-                        let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
-                        this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
-                        this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
-                    });
-                    this.applyBindAttributes(elem, name, value);
-                }
             }
         }
 
