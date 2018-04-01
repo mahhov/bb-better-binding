@@ -36,19 +36,28 @@ source.numbers = [10, 12, 16, 13];
 </div>
 
 <div bind-component="libraryDue with date book">
-    <div style="color:red; font-size:30px" bind="book"></div>
-    <div>due on ${date}</div>
+    <div style="color:${titleColor}; font-size:30px" bind="book"></div>
+    <div>due on $s{date}</div>
 </div>
+
+<input onchange="$f{changeHandler}"> </input>
 ```
 
 ### your `.js` controller
 
 ```js
 const source = require('bb-better-binding')(__dirname, document);
+
 source.overdueBooks = [{
     dueDate: '15-17-32025-02',
     title: 'why humans were taller 8 billion years ago'
 }];
+
+source.titleColor = "red";
+
+source.changeHandler = () => {
+    console.log('stop changing things!!')
+};
 ```
 
 ## HTML syntax
