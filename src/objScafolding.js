@@ -66,8 +66,8 @@ let getFields = paths =>
 
 let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.${match}`);
 
-let notUndefined = value =>
-    value !== undefined ? value : null;
+let notUndefined = (value, undefinedValue = null) =>
+    value !== undefined ? value : undefinedValue;
 
 let splitByWord = (string, word) =>
     string.split(new RegExp(`\\s+${word}\\s+`, 'g'));

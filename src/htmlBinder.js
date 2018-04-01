@@ -102,6 +102,19 @@ class HtmlBinder {
                     this.applyBindValue(elem, value);
                 } else
                     this.applyBindValue(elem, sourceAugmentValue);
+
+            } else { // todo allow using in parallel with other binds
+                let attributes = elem.attributes;
+                for (let i = 0; i < attributes.length; i++) {
+                    let {name, value} = attributes[i];
+                    let matches = value.match(/\${([\w.[\]]+)}/g);
+                    matches && matches.forEach(match => {
+                        let [, bindName] = match.match(/\${([\w.[\]]+)}/);
+                        this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
+                        this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                    });
+                    this.applyBindAttributes(elem, name, value);
+                }
             }
         }
 
@@ -113,7 +126,7 @@ class HtmlBinder {
         if (this.binds[bindName])
             return;
 
-        let bind = {ifs: [], fors: [], values: []};
+        let bind = {ifs: [], fors: [], values: [], attributes: []};
         safeInit(this.binds, bindName, bind);
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
@@ -127,6 +140,10 @@ class HtmlBinder {
 
             bind.values.forEach(elem => {
                 this.applyBindValue(elem, value);
+            });
+
+            bind.attributes.forEach(({elem, name, value}) => {
+                this.applyBindAttributes(elem, name, value);
             });
         });
 
@@ -153,8 +170,14 @@ class HtmlBinder {
         elem.innerHTML = notUndefined(value);
     }
 
+    applyBindAttributes(elem, name, value) {
+        let modifiedValue = value.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : notUndefined(getValue(this.source, [match]), ''));
+        console.log('set', name, 'from', value, 'to', modifiedValue);
+        elem.setAttribute(name, modifiedValue);
+    }
+
     static replaceInlineBindings(elem) {
-        elem.innerHTML = elem.innerHTML.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`);
+        // elem.innerHTML = elem.innerHTML.replace(/([\\])?\${([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo extract
     }
 
     static removeAllChildren(elem) {
@@ -171,7 +194,8 @@ class HtmlBinder {
 //     'a.b.c': {
 //         fors: [{container, outerHtml, sourceMap}],
 //         ifs: [elem1, elem3],
-//         values: [elem1, elem2]
+//         values: [elem1, elem2],
+//         attributes: [{elem1, attributeName, attributeOriginalValue}]
 //     }
 // };
 //
