@@ -31,12 +31,13 @@ class HtmlBinder {
                 let fieldMatches = value.match(/\$f?{([\w.[\]]+)}/g);
                 fieldMatches && fieldMatches.forEach(match => {
                     let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
+                    bindName = translate(bindName, sourceLinks);
                     this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
                     this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
                 });
                 this.applyBindAttributes(elem, name, value);
             }
-            
+
             if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
                 let loadedHtml = document.createElement('div');
