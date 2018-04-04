@@ -36,7 +36,7 @@ class HtmlBinder {
                         this.createBind(bindName, sourceAugment, sourceLinks, linkBaseDir);
                         this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
                     });
-                    this.applyBindAttributes(elem, name, value);
+                    this.applyBindAttributes(elem, name, value, sourceAugment);
                 }
             }
 
@@ -117,7 +117,6 @@ class HtmlBinder {
                     this.applyBindValue(elem, value);
                 } else
                     this.applyBindValue(elem, sourceAugmentValue);
-
             }
         }
 
@@ -146,7 +145,7 @@ class HtmlBinder {
             });
 
             bind.attributes.forEach(({elem, name, value}) => {
-                this.applyBindAttributes(elem, name, value);
+                this.applyBindAttributes(elem, name, value, sourceAugment);
             });
         });
 
@@ -173,11 +172,12 @@ class HtmlBinder {
         elem.innerHTML = notUndefined(value);
     }
 
-    applyBindAttributes(elem, name, value) {
+    applyBindAttributes(elem, name, value, sourceAugment) {
         let modifiedValue = value.replace(/(\\)?\$(f)?{([\w.[\]]+)}/g, (all, prefixSlash, prefixF, match) => {
             if (prefixSlash)
                 return all;
-            let value = notUndefined(getValue(this.source, [match]), '');
+            let sourceAugmentValue = getValue(sourceAugment, [match]);
+            let value = notUndefined(sourceAugmentValue, notUndefined(getValue(this.source, [match]), ''));
             return prefixF ? `(${value})()` : value;
         });
         elem.setAttribute(name, modifiedValue);
