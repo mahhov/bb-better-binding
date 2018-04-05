@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {getValue, setProperty, safeInit, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
+const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
 

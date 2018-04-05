@@ -28,18 +28,8 @@ let setProperty = (obj, paths, value) => {
     property[0][property[1]] = value;
 };
 
-let safeInit = (obj, field, init) => { // todo remove unused
-    obj[field] = obj[field] || init;
-};
-
-let safeInitPath = (obj, path, init) => {
-    let property = creaetProperty(obj, path);
-    property[0][property[1]] = property[0][property[1]] || init;
-};
-
 let clone = original => {
-    let cloned = Object.assign({}, original);
-    return cloned;
+    return Object.assign({}, original);
 };
 
 let modify = (original, key, value) => {
@@ -54,7 +44,7 @@ let translate = (name, links) => {
     while (fields[0] in links) {
         occured.push(fields[0]);
         fields[0] = links[fields[0]];
-        if (occured.includes(fields[0])) // todo uncomment circal check
+        if (occured.includes(fields[0]))
             return fields;
         fields = getFields(fields);
     }
@@ -77,4 +67,4 @@ let splitByWord = (string, word) =>
 let splitBySpace = string =>
     string.split(new RegExp(/\s+/, 'g'));
 
-module.exports = {getProperty, getValue, createProperty, setProperty, safeInit, safeInitPath, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace};
+module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace};
