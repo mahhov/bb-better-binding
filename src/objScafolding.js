@@ -28,7 +28,7 @@ let setProperty = (obj, paths, value) => {
     property[0][property[1]] = value;
 };
 
-let safeInit = (obj, field, init) => {
+let safeInit = (obj, field, init) => { // todo remove unused
     obj[field] = obj[field] || init;
 };
 
@@ -50,13 +50,15 @@ let modify = (original, key, value) => {
 
 let translate = (name, links) => {
     let occured = [];
-    while (name in links) {
-        occured.push(name);
-        name = links[name];
-        if (occured.includes(name))
-            return name;
+    let fields = getFields([name]);
+    while (fields[0] in links) {
+        occured.push(fields[0]);
+        fields[0] = links[fields[0]];
+        if (occured.includes(fields[0])) // todo uncomment circal check
+            return fields;
+        fields = getFields(fields);
     }
-    return name;
+    return fields.reduce((a, b) => `${a}.${b}`); // todo maybe return array fields instead
 };
 
 let getFields = paths =>
@@ -70,7 +72,7 @@ let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
 let splitByWord = (string, word) =>
-    string.split(new RegExp(`\\s+${word}\\s+`, 'g'));
+    string.split(new RegExp(`\\s+${word}\\s+`, 'g')); // todo 'g' flag not necessary for .split
 
 let splitBySpace = string =>
     string.split(new RegExp(/\s+/, 'g'));
