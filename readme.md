@@ -39,11 +39,11 @@ source.changeHandler = () => {
 
 ```html
 <div bind-for="overdueBook in overdueBooks">
-    <div bind-use="libraryDue with overdueBook.dueDate overdueBook.title"></div>
+    <div bind-use="libraryDue with overdueBook.dueDate overdueBook.title overdueBook.titleColor"></div>
 </div>
 
-<div bind-component="libraryDue with date book">
-    <div style="color:${titleColor}; font-size:30px" bind="book"></div>
+<div bind-component="libraryDue with date book titleColor">
+    <div style="color:${titleColor}; font-size:${fontSize}px" bind="book"></div>
     <div>due on $s{date}</div>
 </div>
 ```
@@ -55,10 +55,11 @@ const source = require('bb-better-binding')(__dirname, document);
 
 source.overdueBooks = [{
     dueDate: '15-17-32025-02',
-    title: 'why humans were taller 8 billion years ago'
+    title: 'why humans were taller 8 billion years ago',
+    titleColor: 'red'
 }];
 
-source.titleColor = "red";
+source.fontSize = '30';
 ```
 
 ## HTML syntax
