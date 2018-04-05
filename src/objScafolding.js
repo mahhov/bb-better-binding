@@ -62,9 +62,9 @@ let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
 let splitByWord = (string, word) =>
-    string.split(new RegExp(`\\s+${word}\\s+`, 'g')); // todo 'g' flag not necessary for .split
+    string.split(new RegExp(`\\s+${word}\\s+`));
 
 let splitBySpace = string =>
-    string.split(new RegExp(/\s+/, 'g'));
+    string.split(new RegExp(/\s+/));
 
 module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace};
