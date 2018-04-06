@@ -46,7 +46,7 @@ class HtmlBinder {
                 let functionMatches = value.match(allFunctionRegex);
                 if (functionMatches) {
                     functionMatches.forEach(match => {
-                        let [, , functionName, params] = match.match(functionRegex); // todo bind params
+                        let [, , functionName, params] = match.match(functionRegex);
                         functionName = translate(functionName, sourceLinks);
                         this.createBind(functionName);
                         this.binds[functionName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
@@ -173,6 +173,7 @@ class HtmlBinder {
             let paramsJoined = splitByComma(params)
                 .map(param => translate(param, sourceLinks))
                 .map(param => notUndefined(getValue(this.source, [param]), '')) // todo support ints and strings and objs and arrays and nulls, booleans, undefineds...
+                .map(param => JSON.stringify(param))
                 .reduce((a, b) => `${a}, ${b}`);
             return `(${functionSource})(${paramsJoined})`;
         };
