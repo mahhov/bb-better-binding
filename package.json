@@ -1,6 +1,6 @@
 {
   "name": "bb-better-binding",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
