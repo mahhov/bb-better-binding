@@ -36,9 +36,7 @@ class HtmlBinder {
                 if (bindMatches) {
                     bindMatches.forEach(match => {
                         let [, , bindName] = match.match(bindRegex);
-                        bindName = translate(bindName, sourceLinks);
-                        this.createBind(bindName);
-                        this.binds[bindName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                        this.addAttributeBind(bindName, elem, name, value, sourceLinks);
                     });
                     this.applyBindAttributes(elem, name, value, sourceLinks);
                 }
@@ -47,14 +45,10 @@ class HtmlBinder {
                 if (functionMatches) {
                     functionMatches.forEach(match => {
                         let [, , functionName, params] = match.match(functionRegex);
-                        functionName = translate(functionName, sourceLinks);
-                        this.createBind(functionName);
-                        this.binds[functionName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                        this.addAttributeBind(functionName, elem, name, value, sourceLinks);
                         splitByComma(params)
                             .forEach(param => {
-                                param = translate(param, sourceLinks); // todo extract these 3 lines
-                                this.createBind(param);
-                                this.binds[param].attributes.push({elem, name, value, sourceLinks});
+                                this.addAttributeBind(param, elem, name, value, sourceLinks);
                             });
                     });
                     this.applyBindAttributes(elem, name, value, sourceLinks);
@@ -156,13 +150,22 @@ class HtmlBinder {
             });
         });
     }
+    
+    addAttributeBind(bindName, elem, name, value, sourceLinks) {
+        bindName = translate(bindName, sourceLinks);
+        this.createBind(bindName);
+        let binded = this.binds[bindName].attributes.every(bindAttribute =>
+            bindAttribute.elem === elem && bindAttribute.name === name
+        );
+        !binded && this.binds[bindName].attributes.push({elem, name, value, sourceLinks});
+    }
 
-    applyBindAttributes(elem, name, value, sourceLinks) { // todo use source links
+    applyBindAttributes(elem, name, value, sourceLinks) {
         let replaceBind = (all, prefixSlash, match) => {
             if (prefixSlash)
                 return all;
             match = translate(match, sourceLinks);
-            return notUndefined(getValue(this.source, [match]), ''); // todo helper function to get soruce value
+            return notUndefined(getValue(this.source, [match]), '');
         };
 
         let replaceFunction = (all, prefixSlash, functionName, params) => {
@@ -221,13 +224,12 @@ class HtmlBinder {
     }
 }
 
-// todo update below examples to include sourcelinks and dir base inside fors/attributes
 // binds = {
 //     'a.b.c': {
-//         fors: [{container, outerHtml, sourceTo, sourceFrom}],
+//         fors: [{container, outerHtml, sourceTo, sourceFrom, sourceLinks}],
 //         ifs: [elem1, elem3],
 //         values: [elem1, elem2],
-//         attributes: [{elem1, attributeName, attributeOriginalValue}]
+//         attributes: [{elem1, attributeName, attributeOriginalValue, sourceLinks}]
 //     }
 // };
 //
