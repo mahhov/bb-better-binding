@@ -125,12 +125,12 @@ binds `source.i` to the element name and `source.favoriteColor` and `source.larg
 
 ### function binding
 
-`<input onclick="$f{logHello}" onchange="$f{logWoah}"> </input>`
+`<input onclick="$f{logHello(userName, '!!!')}" onchange="$f{logWoah()}"> </input>`
 
 binds wrapped invocaters of the functions `source.logHello` and `source.logWoah` to the element's `onclick` and `onchange` attribute 
 
-for example, if `source.logHello = () => { console.log('hi') }`
+for example, if `source.logHello = (name, punctuation) => { console.log('hi', name, punctuation) }` and `source.userName = 'kangaroo'`,
 
-then sets element's onclick to `( () => { console.log('hello') } ) ()` 
+then sets element's onclick to `( (name, punctuation) => { console.log('hi', name, punctuation) } ) ('kangraoo', '!!!')` 
 
-this is a convenience syntax for the equally valid `onclick="(${logHello)()"` syntax 
+this is a convenience syntax for the equally valid `onclick="(${logHello)(${username}, '!!!')"` syntax 
