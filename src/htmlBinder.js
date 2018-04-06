@@ -171,9 +171,11 @@ class HtmlBinder {
             functionName = translate(functionName, sourceLinks);
             let functionSource = notUndefined(getValue(this.source, [functionName]), '');
             let paramsJoined = splitByComma(params)
-                .map(param => translate(param, sourceLinks))
-                .map(param => notUndefined(getValue(this.source, [param]), '')) // todo support ints and strings and objs and arrays and nulls, booleans, undefineds...
-                .map(param => JSON.stringify(param))
+                .map(param => {
+                    let paramTranslated = translate(param, sourceLinks);
+                    let paramSourced = getValue(this.source, [paramTranslated]);
+                    return paramSourced && JSON.stringify(paramSourced) || param;
+                })
                 .reduce((a, b) => `${a}, ${b}`);
             return `(${functionSource})(${paramsJoined})`;
         };
