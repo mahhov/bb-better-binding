@@ -2,7 +2,6 @@ const {notUndefined} = require('./objScafolding');
 
 let createSource = () => {
     let handlers = {};
-    window.h = handlers; // todo delete
     let source = createProxy({}, handlers);
     return {source, handlers};
 };

@@ -35,8 +35,8 @@ class HtmlBinder {
                     fieldMatches.forEach(match => {
                         let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
                         bindName = translate(bindName, sourceLinks);
-                        this.createBind(bindName, sourceLinks, linkBaseDir);
-                        this.binds[bindName].attributes.push({elem, name, value}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                        this.createBind(bindName);
+                        this.binds[bindName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
                     });
                     this.applyBindAttributes(elem, name, value, sourceLinks);
                 }
@@ -87,20 +87,20 @@ class HtmlBinder {
                 elem.replaceWith(container);
                 elem.removeAttribute('bind-for');
                 let outerHtml = elem.outerHTML;
-                this.createBind(bindName, sourceLinks, linkBaseDir);
-                this.binds[bindName].fors.push({container, outerHtml, sourceTo, sourceFrom: bindName});
+                this.createBind(bindName);
+                this.binds[bindName].fors.push({container, outerHtml, sourceTo, sourceFrom: bindName, sourceLinks});
                 this.applyBindFor(container, outerHtml, sourceTo, bindName, linkBaseDir);
 
             } else if (bindIf) {
                 bindIf = translate(bindIf, sourceLinks);
-                this.createBind(bindIf, sourceLinks, linkBaseDir);
+                this.createBind(bindIf);
                 this.binds[bindIf].ifs.push(elem);
                 let value = getValue(this.source, [bindIf]);
                 this.applyBindIf(elem, value);
 
             } else if (bindValue) {
                 bindValue = translate(bindValue, sourceLinks);
-                this.createBind(bindValue, sourceLinks, linkBaseDir);
+                this.createBind(bindValue);
                 this.binds[bindValue].values.push(elem);
                 let value = getValue(this.source, [bindValue]);
                 this.applyBindValue(elem, value);
@@ -112,7 +112,7 @@ class HtmlBinder {
                 this.bindElem(elem.children[i], sourceLinks, linkBaseDir);
     }
 
-    createBind(bindName, sourceLinks, linkBaseDir) {
+    createBind(bindName) {
         if (this.binds[bindName])
             return;
 
@@ -120,11 +120,11 @@ class HtmlBinder {
         this.binds[bindName] = bind;
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
-            bind.attributes.forEach(({elem, name, value}) => {
+            bind.attributes.forEach(({elem, name, value, sourceLinks}) => {
                 this.applyBindAttributes(elem, name, value, sourceLinks);
             });
 
-            bind.fors.forEach(({container, outerHtml, sourceTo, sourceFrom}) => {
+            bind.fors.forEach(({container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
                 this.applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
             });
 
