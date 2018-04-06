@@ -67,4 +67,7 @@ let splitByWord = (string, word) =>
 let splitBySpace = string =>
     string.split(new RegExp(/\s+/));
 
-module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace};
+let splitByComma = string =>
+    string.split(new RegExp(/\s*,\s*/));
+
+module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma};

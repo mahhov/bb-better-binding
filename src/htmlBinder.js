@@ -1,7 +1,8 @@
 const fs = require('fs');
-const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
+const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma} = require('./objScafolding');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
+const {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex} = require('./regex');
 
 class HtmlBinder {
 
@@ -30,13 +31,31 @@ class HtmlBinder {
             let attributes = elem.attributes;
             for (let i = 0; i < attributes.length; i++) {
                 let {name, value} = attributes[i];
-                let fieldMatches = value.match(/\$f?{([\w.[\]]+)}/g);
-                if (fieldMatches) {
-                    fieldMatches.forEach(match => {
-                        let [, bindName] = match.match(/\$f?{([\w.[\]]+)}/);
+
+                let bindMatches = value.match(allBindRegex);
+                if (bindMatches) {
+                    bindMatches.forEach(match => {
+                        let [, , bindName] = match.match(bindRegex);
                         bindName = translate(bindName, sourceLinks);
                         this.createBind(bindName);
                         this.binds[bindName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                    });
+                    this.applyBindAttributes(elem, name, value, sourceLinks);
+                }
+
+                let functionMatches = value.match(allFunctionRegex);
+                if (functionMatches) {
+                    functionMatches.forEach(match => {
+                        let [, , functionName, params] = match.match(functionRegex); // todo bind params
+                        functionName = translate(functionName, sourceLinks);
+                        this.createBind(functionName);
+                        this.binds[functionName].attributes.push({elem, name, value, sourceLinks}); // todo prevent duplicates when same source bindName used multiple times in same attribute value
+                        splitByComma(params)
+                            .forEach(param => {
+                                param = translate(param, sourceLinks); // todo extract these 3 lines
+                                this.createBind(param);
+                                this.binds[param].attributes.push({elem, name, value, sourceLinks});
+                            });
                     });
                     this.applyBindAttributes(elem, name, value, sourceLinks);
                 }
@@ -138,14 +157,29 @@ class HtmlBinder {
         });
     }
 
-    applyBindAttributes(elem, name, value, sourceLinks) {
-        let modifiedValue = value.replace(/(\\)?\$(f)?{([\w.[\]]+)}/g, (all, prefixSlash, prefixF, match) => {
+    applyBindAttributes(elem, name, value, sourceLinks) { // todo use source links
+        let replaceBind = (all, prefixSlash, match) => {
             if (prefixSlash)
                 return all;
             match = translate(match, sourceLinks);
-            let value = notUndefined(getValue(this.source, [match]), '');
-            return prefixF ? `(${value})()` : value;
-        });
+            return notUndefined(getValue(this.source, [match]), ''); // todo helper function to get soruce value
+        };
+
+        let replaceFunction = (all, prefixSlash, functionName, params) => {
+            if (prefixSlash)
+                return all;
+            functionName = translate(functionName, sourceLinks);
+            let functionSource = notUndefined(getValue(this.source, [functionName]), '');
+            let paramsJoined = splitByComma(params)
+                .map(param => translate(param, sourceLinks))
+                .map(param => notUndefined(getValue(this.source, [param]), '')) // todo support ints and strings and objs and arrays and nulls, booleans, undefineds...
+                .reduce((a, b) => `${a}, ${b}`);
+            return `(${functionSource})(${paramsJoined})`;
+        };
+
+        let modifiedValue = value
+            .replace(allBindRegex, (all, prefixSlash, match) => replaceBind(all, prefixSlash, match))
+            .replace(allFunctionRegex, (all, prefixSlash, functionName, params) => replaceFunction(all, prefixSlash, functionName, params));
         elem.setAttribute(name, modifiedValue);
     }
 
@@ -171,7 +205,7 @@ class HtmlBinder {
     }
 
     static replaceInlineBindings(elem) {
-        elem.innerHTML = elem.innerHTML.replace(/(\\)?\$s{([\w.[\]]+)}/g, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo similar regex expressions extract
+        elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo don't include \ in return for escaped regex
     }
 
     static removeAllChildren(elem) {
@@ -184,6 +218,7 @@ class HtmlBinder {
     }
 }
 
+// todo update below examples to include sourcelinks and dir base inside fors/attributes
 // binds = {
 //     'a.b.c': {
 //         fors: [{container, outerHtml, sourceTo, sourceFrom}],
