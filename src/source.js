@@ -2,25 +2,21 @@ const {notUndefined} = require('./objScafolding');
 
 let createSource = () => {
     let handlers = {};
+    window.h = handlers; // todo delete
     let source = createProxy({}, handlers);
     return {source, handlers};
 };
 
-let createProxy = (obj, handlers, arrayHandler) => new Proxy(obj, {
+let createProxy = (obj, handlers) => new Proxy(obj, {
     get: (target, prop) => {
         let got = Reflect.get(target, prop);
-        if (Array.isArray(got))
-            return createProxy(got, null, handlers && handlers[prop]);
-        else if (typeof got === 'object' && got !== null)
-            return createProxy(got, handlers && handlers[prop]);
-        else
-            return got;
+        return typeof got === 'object' && got !== null ? createProxy(got, handlers && handlers[prop]) : got;
     },
     set: (target, prop, value) => {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
 
-            handlers && propogateHandlerDown(handlers[prop], value) || propogateHandlerDown(arrayHandler, obj);
+            handlers && propogateHandlerDown(handlers[prop], value);
         }
         return true;
     }
