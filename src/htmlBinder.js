@@ -154,10 +154,11 @@ class HtmlBinder {
     addAttributeBind(bindName, elem, name, value, sourceLinks) {
         bindName = translate(bindName, sourceLinks);
         this.createBind(bindName);
-        let binded = this.binds[bindName].attributes.every(bindAttribute =>
+        let binded = this.binds[bindName].attributes.some(bindAttribute =>
             bindAttribute.elem === elem && bindAttribute.name === name
         );
         !binded && this.binds[bindName].attributes.push({elem, name, value, sourceLinks});
+        // todo prevent binding non source values
     }
 
     applyBindAttributes(elem, name, value, sourceLinks) {
