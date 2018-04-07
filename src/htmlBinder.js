@@ -150,7 +150,7 @@ class HtmlBinder {
             });
         });
     }
-    
+
     addAttributeBind(bindName, elem, name, value, sourceLinks) {
         bindName = translate(bindName, sourceLinks);
         this.createBind(bindName);
@@ -163,14 +163,14 @@ class HtmlBinder {
     applyBindAttributes(elem, name, value, sourceLinks) {
         let replaceBind = (all, prefixSlash, match) => {
             if (prefixSlash)
-                return all;
+                return all.substr(1);
             match = translate(match, sourceLinks);
             return notUndefined(getValue(this.source, [match]), '');
         };
 
         let replaceFunction = (all, prefixSlash, functionName, params) => {
             if (prefixSlash)
-                return all;
+                return all.substr(1);
             functionName = translate(functionName, sourceLinks);
             let functionSource = notUndefined(getValue(this.source, [functionName]), '');
             let paramsJoined = splitByComma(params)
@@ -211,7 +211,7 @@ class HtmlBinder {
     }
 
     static replaceInlineBindings(elem) {
-        elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefix, match) => prefix ? all : `<span bind="${match}"></span>`); // todo don't include \ in return for escaped regex
+        elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefix, match) => prefix ? all.substr(1) : `<span bind="${match}"></span>`);
     }
 
     static removeAllChildren(elem) {
