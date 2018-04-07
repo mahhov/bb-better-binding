@@ -133,4 +133,4 @@ for example, if `source.logHello = (name, punctuation) => { console.log('hi', na
 
 then sets element's onclick to `( (name, punctuation) => { console.log('hi', name, punctuation) } ) ('kangraoo', '!!!')` 
 
-this is a convenience syntax for the equally valid `onclick="(${logHello)(${username}, '!!!')"` syntax 
+this is a convenience syntax for the equally valid `onclick="(${logHello})(${username}, '!!!')"` syntax 
