@@ -12,7 +12,8 @@ class HtmlBinder {
         this.source = source;
         this.handlers = handlers;
         this.components = {};
-        HtmlBinder.replaceInlineBindings(root.children[0]);
+        this.root = root.children[0];
+        HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
     }
 
@@ -133,6 +134,11 @@ class HtmlBinder {
         this.binds[bindName] = bind;
 
         setProperty(this.handlers, [bindName, '_func_'], value => {
+            bind.attributes = bind.attributes.filter(({elem}) => this.root.contains(elem));
+            bind.fors = bind.fors.filter(({container}) => this.root.contains(container));
+            bind.ifs = bind.ifs.filter(elem => this.root.contains(elem));
+            bind.values = bind.values.filter(elem => this.root.contains(elem));
+
             bind.attributes.forEach(({elem, name, value, sourceLinks}) => {
                 this.applyBindAttributes(elem, name, value, sourceLinks);
             });
