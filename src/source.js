@@ -1,5 +1,3 @@
-const {notUndefined} = require('./objScafolding');
-
 let createSource = () => {
     let handlers = {};
     let source = createProxy({}, handlers);
@@ -15,22 +13,22 @@ let createProxy = (obj, handlers) => new Proxy(obj, {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
 
-            handlers && propogateHandlerDown(handlers[prop], value);
+            handlers && propogateHandlerDown(handlers[prop]);
         }
         return true;
     }
 });
 
-let propogateHandlerDown = (handlers, value) => {
+let propogateHandlerDown = handlers => {
     if (!handlers)
         return;
 
     if (typeof handlers._func_ === 'function')
-        handlers._func_(value);
+        handlers._func_();
 
     for (key in handlers)
         if (key !== '_func_')
-            propogateHandlerDown(handlers[key], notUndefined(value && value[key]));
+            propogateHandlerDown(handlers[key]);
 };
 
 module.exports = {createSource};

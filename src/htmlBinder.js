@@ -132,7 +132,9 @@ class HtmlBinder {
         let bind = {ifs: [], fors: [], values: [], attributes: []};
         this.binds[bindName] = bind;
 
-        setProperty(this.handlers, [bindName, '_func_'], value => {
+        setProperty(this.handlers, [bindName, '_func_'], () => {
+            let value = getValue(this.source, [bindName]);
+            
             bind.attributes = bind.attributes.filter(({elem}) => this.root.contains(elem));
             bind.fors = bind.fors.filter(({container}) => this.root.contains(container));
             bind.ifs = bind.ifs.filter(elem => this.root.contains(elem));
