@@ -13,7 +13,7 @@ let createProxy = (obj, handlers) => new Proxy(obj, {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
 
-            handlers && propogateHandlerDown(handlers[prop]);
+            handlers && propogateHandlerDown(handlers);
         }
         return true;
     }
