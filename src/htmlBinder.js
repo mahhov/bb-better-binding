@@ -1,7 +1,7 @@
 const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma} = require('./objScafolding');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
-const {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex} = require('./regex');
+const {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex, expressionRegex, allExpressionMatches} = require('./regex');
 
 class HtmlBinder {
 
@@ -105,18 +105,12 @@ class HtmlBinder {
                 this.applyBindFor(container, outerHtml, sourceTo, bindName, linkBaseDir);
 
             } else if (bindIf) {
-                bindIf = translate(bindIf, sourceLinks);
-                this.createBind(bindIf);
-                this.binds[bindIf].ifs.push(elem);
-                let value = getValue(this.source, [bindIf]);
-                this.applyBindIf(elem, value);
+                let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
+                this.applyBindIf(elem, expressionName, params, bindName);
 
             } else if (bindValue) {
-                bindValue = translate(bindValue, sourceLinks);
-                this.createBind(bindValue);
-                this.binds[bindValue].values.push(elem);
-                let value = getValue(this.source, [bindValue]);
-                this.applyBindValue(elem, value);
+                let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindValue, 'values', sourceLinks);
+                this.applyBindValue(elem, expressionName, params, bindName);
             }
         }
 
@@ -133,12 +127,10 @@ class HtmlBinder {
         this.binds[bindName] = bind;
 
         setProperty(this.handlers, [bindName, '_func_'], () => {
-            let value = getValue(this.source, [bindName]);
-            
             bind.attributes = bind.attributes.filter(({elem}) => this.root.contains(elem));
             bind.fors = bind.fors.filter(({container}) => this.root.contains(container));
-            bind.ifs = bind.ifs.filter(elem => this.root.contains(elem));
-            bind.values = bind.values.filter(elem => this.root.contains(elem));
+            bind.ifs = bind.ifs.filter(({elem}) => this.root.contains(elem));
+            bind.values = bind.values.filter(({elem}) => this.root.contains(elem));
 
             bind.attributes.forEach(({elem, name, value, sourceLinks}) => {
                 this.applyBindAttributes(elem, name, value, sourceLinks);
@@ -148,14 +140,37 @@ class HtmlBinder {
                 this.applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
             });
 
-            bind.ifs.forEach(elem => {
-                this.applyBindIf(elem, value);
+            bind.ifs.forEach(({elem, expressionName, params}) => {
+                this.applyBindIf(elem, expressionName, params);
             });
 
-            bind.values.forEach(elem => {
-                this.applyBindValue(elem, value);
+            bind.values.forEach(({elem, expressionName, params, bindName}) => {
+                this.applyBindValue(elem, expressionName, params, bindName);
             });
         });
+    }
+
+    extractExpressionBind(elem, expressionStr, type, sourceLinks) { // type = 'ifs' or 'values' 
+        let expressionMatch = expressionStr.match(expressionRegex);
+        if (expressionMatch) {
+            let [, , expressionName, paramsStr] = expressionMatch;
+            expressionName = translate(expressionName, sourceLinks);
+            let params = splitByComma(paramsStr)
+                .map(param => translate(param, sourceLinks));
+            let expressionValue = {elem, expressionName, params};
+            this.addExpressionBind(expressionName, elem, type, expressionValue);
+            params
+                .forEach(param => {
+                    this.addExpressionBind(param, elem, type, expressionValue);
+                });
+            return expressionValue;
+
+        } else {
+            let bindName = translate(expressionStr, sourceLinks);
+            let expressionValue = {elem, bindName};
+            this.addExpressionBind(bindName, elem, type, expressionValue);
+            return expressionValue;
+        }
     }
 
     addAttributeBind(bindName, elem, name, value, sourceLinks) {
@@ -165,6 +180,15 @@ class HtmlBinder {
             bindAttribute.elem === elem && bindAttribute.name === name
         );
         !binded && this.binds[bindName].attributes.push({elem, name, value, sourceLinks});
+        // todo prevent binding non source values
+    }
+
+    addExpressionBind(bindName, elem, type, expressionValue) { // type = 'ifs' or 'values' 
+        this.createBind(bindName);
+        let binded = this.binds[bindName][type].some(otherBind =>
+            otherBind.elem === elem
+        );
+        !binded && this.binds[bindName][type].push(expressionValue);
         // todo prevent binding non source values
     }
 
@@ -210,12 +234,32 @@ class HtmlBinder {
             });
     }
 
-    applyBindIf(elem, value) {
+    applyBindIf(elem, expressionName, params, bindName) {
+        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
         elem.hidden = !value;
     }
 
-    applyBindValue(elem, value) {
+    applyBindValue(elem, expressionName, params, bindName) {
+        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
         elem.innerHTML = notUndefined(value);
+    }
+
+    obtainExpressionValue(elem, expressionName, params, bindName) {
+        if (!expressionName)
+            return getValue(this.source, [bindName]);
+
+        let expression = getValue(this.source, [expressionName]);
+        let paramValues = params.map(param => {
+            let sourceValue = getValue(this.source, [param]);
+            if (sourceValue)
+                return sourceValue;
+            try {
+                return JSON.parse(param);
+            } catch (exception) {
+                return param;
+            }
+        });
+        return typeof expression === 'function' && expression(...paramValues);
     }
 
     static replaceInlineBindings(elem) {
@@ -235,8 +279,8 @@ class HtmlBinder {
 // binds = {
 //     'a.b.c': {
 //         fors: [{container, outerHtml, sourceTo, sourceFrom, sourceLinks}],
-//         ifs: [elem1, elem3],
-//         values: [elem1, elem2],
+//         ifs: [expressionBind1, expressionBind3],
+//         values: [expressionBind1, expressionBind2],
 //         attributes: [{elem1, attributeName, attributeOriginalValue, sourceLinks}]
 //     }
 // };
@@ -266,5 +310,13 @@ class HtmlBinder {
 //         params: []
 //     }
 // };
+//
+// expressionBind = {
+//     elem: elem1,
+//     expressionName, // can be null
+//     params: [],
+//     bindName // can be null
+// };
 
-module.exports = (dir, document) => new HtmlBinder(dir, document).source;
+module
+    .exports = (dir, document) => new HtmlBinder(dir, document).source;

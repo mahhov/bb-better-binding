@@ -6,10 +6,14 @@ let bindRegex = /(\\)?\${([\w.[\]]+)}/;
 
 let functionRegex = /(\\)?\$f{([\w.[\]]+)\((.*)\)}/;
 
+let expressionRegex = /(\\)?\$e{([\w.[\]]+)\((.*)\)}/;
+
 let allSpanRegex = new RegExp(spanRegex, 'g');
 
 let allBindRegex = new RegExp(bindRegex, 'g');
 
 let allFunctionRegex = new RegExp(functionRegex, 'g');
 
-module.exports = {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex};
+let allExpressionRegex = /(\\)?\$e{([\w.[\]]+)\((.*)\)}/;
+
+module.exports = {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex, expressionRegex, allExpressionRegex};
