@@ -134,3 +134,11 @@ for example, if `source.logHello = (name, punctuation) => { console.log('hi', na
 then sets element's onclick to `( (name, punctuation) => { console.log('hi', name, punctuation) } ) ('kangraoo', '!!!')` 
 
 this is a convenience syntax for the equally valid `onclick="(${logHello})('${username}', '!!!')"` syntax 
+
+### expression binding
+
+`<div bind-if="$e{equals(value, 3)}"> $s{value} </div> `
+
+binds `source.value` and `source.equals` to the `bind-if` binding. If either changes, the expression will be reevaluated.
+
+for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, then the `div` will be visible. 
