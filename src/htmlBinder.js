@@ -235,18 +235,18 @@ class HtmlBinder {
     }
 
     applyBindIf(elem, expressionName, params, bindName) {
-        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
+        let value = this.obtainExpressionValue(expressionName, params, bindName);
         elem.hidden = !value;
     }
 
     applyBindValue(elem, expressionName, params, bindName) {
-        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
+        let value = this.obtainExpressionValue(expressionName, params, bindName);
         elem.innerHTML = notUndefined(value);
     }
 
-    obtainExpressionValue(elem, expressionName, params, bindName) {
+    obtainExpressionValue(expressionName, params, bindName) {
         if (!expressionName)
-            return getValue(this.source, [bindName]);
+            return getValue(this.source, [bindName]); // todo fix exception with old if
 
         let expression = getValue(this.source, [expressionName]);
         let paramValues = params.map(param => {
