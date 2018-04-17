@@ -140,8 +140,8 @@ class HtmlBinder {
                 this.applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
             });
 
-            bind.ifs.forEach(({elem, expressionName, params}) => {
-                this.applyBindIf(elem, expressionName, params);
+            bind.ifs.forEach(({elem, expressionName, params, bindName}) => {
+                this.applyBindIf(elem, expressionName, params, bindName);
             });
 
             bind.values.forEach(({elem, expressionName, params, bindName}) => {
@@ -245,6 +245,7 @@ class HtmlBinder {
     }
 
     obtainExpressionValue(expressionName, params, bindName) {
+        console.log(expressionName, params, bindName);
         if (!expressionName)
             return getValue(this.source, [bindName]); // todo fix exception with old if
 
