@@ -251,12 +251,12 @@ class HtmlBinder {
         let expression = getValue(this.source, [expressionName]);
         let paramValues = params.map(param => {
             let sourceValue = getValue(this.source, [param]);
-            if (sourceValue)
+            if (sourceValue !== undefined)
                 return sourceValue;
             try {
-                return JSON.parse(param);
+                return JSON.parse(param.replace(/'/g, '"'));
             } catch (exception) {
-                return param;
+                return undefined;
             }
         });
         return typeof expression === 'function' && expression(...paramValues);
