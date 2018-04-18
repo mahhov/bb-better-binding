@@ -245,9 +245,8 @@ class HtmlBinder {
     }
 
     obtainExpressionValue(expressionName, params, bindName) {
-        console.log(expressionName, params, bindName);
         if (!expressionName)
-            return getValue(this.source, [bindName]); // todo fix exception with old if
+            return getValue(this.source, [bindName]);
 
         let expression = getValue(this.source, [expressionName]);
         let paramValues = params.map(param => {
