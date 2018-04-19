@@ -23,7 +23,7 @@ class ParamSplitter {
 
         this.addParam();
         return this.params;
-    };
+    }
 
     findIndex(regex, start) { // returns -1 or index of match
         let index = this.string.substring(start).search(regex);
@@ -44,7 +44,7 @@ class ParamSplitter {
         let char = this.string[this.index];
         this.index = this.findIndex(char === '"' ? /[^\\]"/ : /[^\\]'/, this.index + 1) + 1;
         return this.index;
-    };
+    }
 
     addParam() {
         this.params.push(this.string.substring(this.startIndex, this.index > 0 ? this.index : this.string.length).trim());
