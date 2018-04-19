@@ -71,3 +71,5 @@ let splitByComma = string =>
     string.split(new RegExp(/\s*,\s*/));
 
 module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma};
+
+// todo split up into multiple files

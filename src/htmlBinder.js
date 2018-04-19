@@ -1,4 +1,5 @@
 const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma} = require('./objScafolding');
+const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
 const {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex, expressionRegex, allExpressionMatches} = require('./regex');
@@ -155,7 +156,7 @@ class HtmlBinder {
         if (expressionMatch) {
             let [, , expressionName, paramsStr] = expressionMatch;
             expressionName = translate(expressionName, sourceLinks);
-            let params = splitByComma(paramsStr)
+            let params = splitByParams(paramsStr)
                 .map(param => translate(param, sourceLinks));
             let expressionValue = {elem, expressionName, params};
             this.addExpressionBind(expressionName, elem, type, expressionValue);
