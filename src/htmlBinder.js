@@ -31,28 +31,13 @@ class HtmlBinder {
 
             let attributes = elem.attributes;
             for (let i = 0; i < attributes.length; i++) {
-                let {name, value} = attributes[i];
+                let {name: attributeName, value} = attributes[i];
 
-                let bindMatches = value.match(allBindRegex);
+                let bindMatches = value.match(bindRegex);
                 if (bindMatches) {
-                    bindMatches.forEach(match => {
-                        let [, , bindName] = match.match(bindRegex);
-                        this.addAttributeBind(bindName, elem, name, value, sourceLinks);
-                    });
-                    this.applyBindAttributes(elem, name, value, sourceLinks);
-                }
-
-                let functionMatches = value.match(allFunctionRegex);
-                if (functionMatches) {
-                    functionMatches.forEach(match => {
-                        let [, , functionName, params] = match.match(functionRegex);
-                        this.addAttributeBind(functionName, elem, name, value, sourceLinks);
-                        splitByComma(params)
-                            .forEach(param => {
-                                this.addAttributeBind(param, elem, name, value, sourceLinks);
-                            });
-                    });
-                    this.applyBindAttributes(elem, name, value, sourceLinks);
+                    let attributeBind = this.addAttributeBind(elem, attributeName, value, sourceLinks);
+                    let {functionName, params} = attributeBind;
+                    this.applyBindAttributes(elem, attributeName, functionName, params);
                 }
             }
 
@@ -133,8 +118,8 @@ class HtmlBinder {
             bind.ifs = bind.ifs.filter(({elem}) => this.root.contains(elem));
             bind.values = bind.values.filter(({elem}) => this.root.contains(elem));
 
-            bind.attributes.forEach(({elem, name, value, sourceLinks}) => {
-                this.applyBindAttributes(elem, name, value, sourceLinks);
+            bind.attributes.forEach(({elem, attributeName, functionName, params}) => {
+                this.applyBindAttributes(elem, attributeName, functionName, params);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
@@ -174,14 +159,38 @@ class HtmlBinder {
         }
     }
 
-    addAttributeBind(bindName, elem, name, value, sourceLinks) {
-        bindName = translate(bindName, sourceLinks);
-        this.createBind(bindName);
-        let binded = this.binds[bindName].attributes.some(bindAttribute =>
-            bindAttribute.elem === elem && bindAttribute.name === name
-        );
-        !binded && this.binds[bindName].attributes.push({elem, name, value, sourceLinks});
-        // todo prevent binding non source values
+    addAttributeBind(elem, attributeName, value, sourceLinks) {
+        // let functionMatch = value.match(functionRegex);
+        // console.log(value, functionRegex);
+        // if (functionMatch) {
+        //     let [all, prefixSlash, functionName, params] = functionMatch;
+        //     functionName = translate(match, functionName);
+        //     // functionName = translate(match, functionName);
+        //     console.log(params);
+        //     // let attributeBind = {elem, attributeName, functionName, params};
+        //     // this.binds[bindName].attributes.push(attributeBind);
+        //     // return attributeBind;
+        // }
+
+        let params = value.split(/((?:\\)?\${(?:[\w.[\]]+)})/) // todo extract to regex
+            .map(param => {
+                let matchList = param.match(bindRegex);
+                if (!matchList)
+                    return {stringValue: param};
+                let [all, prefixSlash, match] = matchList;
+                return prefixSlash ? {stringValue: all.substr(1)} : {sourceValue: translate(match, sourceLinks)};
+            });
+
+        let attributeBind = {elem, attributeName, params};
+
+        params
+            .filter(param => param.sourceValue)
+            .forEach(({sourceValue: bindName}) => {
+                this.createBind(bindName);
+                this.binds[bindName].attributes.push(attributeBind);
+            });
+
+        return attributeBind;
     }
 
     addExpressionBind(bindName, elem, type, expressionValue) { // type = 'ifs' or 'values' 
@@ -193,33 +202,11 @@ class HtmlBinder {
         // todo prevent binding non source values
     }
 
-    applyBindAttributes(elem, name, value, sourceLinks) {
-        let replaceBind = (all, prefixSlash, match) => {
-            if (prefixSlash)
-                return all.substr(1);
-            match = translate(match, sourceLinks);
-            return notUndefined(getValue(this.source, [match]), '');
-        };
-
-        let replaceFunction = (all, prefixSlash, functionName, params) => {
-            if (prefixSlash)
-                return all.substr(1);
-            functionName = translate(functionName, sourceLinks);
-            let functionSource = notUndefined(getValue(this.source, [functionName]), '');
-            let paramsJoined = splitByComma(params)
-                .map(param => {
-                    let paramTranslated = translate(param, sourceLinks);
-                    let paramSourced = getValue(this.source, [paramTranslated]);
-                    return paramSourced && JSON.stringify(paramSourced) || param;
-                })
-                .reduce((a, b) => `${a}, ${b}`);
-            return `(${functionSource})(${paramsJoined})`;
-        };
-
-        let modifiedValue = value
-            .replace(allBindRegex, (all, prefixSlash, match) => replaceBind(all, prefixSlash, match))
-            .replace(allFunctionRegex, (all, prefixSlash, functionName, params) => replaceFunction(all, prefixSlash, functionName, params));
-        elem.setAttribute(name, modifiedValue);
+    applyBindAttributes(elem, attributeName, functionName, params) {
+        let modifiedValue = params
+            .map(param => param.sourceValue ? notUndefined(getValue(this.source, [param.sourceValue]), '') : param.stringValue)
+            .reduce((a, b) => a + b);
+        elem.setAttribute(attributeName, modifiedValue);
     }
 
     applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
@@ -282,7 +269,7 @@ class HtmlBinder {
 //         fors: [{container, outerHtml, sourceTo, sourceFrom, sourceLinks}],
 //         ifs: [expressionBind1, expressionBind3],
 //         values: [expressionBind1, expressionBind2],
-//         attributes: [{elem1, attributeName, attributeOriginalValue, sourceLinks}]
+//         attributes: [attributeBind1, attributeBind2]
 //     }
 // };
 //
@@ -310,6 +297,13 @@ class HtmlBinder {
 //         outerHtml: outerHtml,
 //         params: []
 //     }
+// };
+//
+// attributeBind = {
+//     elem: elem1,
+//     attributeName,
+//     functionName, // can be null
+//     params: [{stringValue | sourceValue: string}]
 // };
 //
 // expressionBind = {
