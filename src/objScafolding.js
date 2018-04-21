@@ -48,7 +48,7 @@ let translate = (name, links) => {
             return fields;
         fields = getFields(fields);
     }
-    return fields.reduce((a, b) => `${a}.${b}`); // todo maybe return array fields instead
+    return fields.reduce((a, b) => `${a}.${b}`);
 };
 
 let getFields = paths =>

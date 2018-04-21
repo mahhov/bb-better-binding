@@ -2,7 +2,7 @@ const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
-const {spanRegex, allSpanRegex, bindRegex, allBindRegex, functionRegex, allFunctionRegex, expressionRegex, allExpressionMatches} = require('./regex');
+const {spanRegex, allSpanRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
 
 class HtmlBinder {
 
@@ -38,7 +38,7 @@ class HtmlBinder {
                     let {params} = attributeBind;
                     this.applyBindAttributes(elem, attributeName, null, params);
 
-                } else if (value.match(/(\\)?\${([\w.[\]]+)\((.*)\)}/)) { // todo extract regex
+                } else if (value.match(functionRegex)) {
                     let attributeBind = this.addAttributeFunctionBind(elem, attributeName, value, sourceLinks);
                     let {functionName, params} = attributeBind;
                     this.applyBindAttributes(elem, attributeName, functionName, params);
@@ -164,7 +164,7 @@ class HtmlBinder {
     }
 
     addAttributeBind(elem, attributeName, value, sourceLinks) {
-        let params = value.split(/((?:\\)?\${(?:[\w.[\]]+)})/) // todo extract to regex
+        let params = value.split(bindRegexUncapturing)
             .map(param => {
                 let matchList = param.match(bindRegex);
                 if (!matchList)
@@ -186,7 +186,7 @@ class HtmlBinder {
     }
 
     addAttributeFunctionBind(elem, attributeName, value, sourceLinks) {
-        let [all, prefixSlash, functionName, paramsStr] = value.match(/(\\)?\${([\w.[\]]+)\((.*)\)}/); // todo prefixSlash
+        let [all, prefixSlash, functionName, paramsStr] = value.match(functionRegex); // todo prefixSlash
         functionName = translate(functionName, sourceLinks);
         let params = splitByParams(paramsStr)
             .map(param => translate(param, sourceLinks));
