@@ -17,7 +17,7 @@ run: `npm i -save bb-beter-binding`
     </div>
 </div>
 
-<input onchange="$f{changeHandler}"> </input>
+<input onchange="${changeHandler()}"> </input>
 ```
 
 ### your `.js` controller
@@ -125,15 +125,12 @@ binds `source.i` to the element name and `source.favoriteColor` and `source.larg
 
 ### function binding
 
-`<input onclick="$f{logHello(userName, '!!!')}" onchange="$f{logWoah()}"> </input>`
+`<input onclick="${logHello(userName, '!!!')}" onchange="${logWoah()}"> </input>`
 
-binds wrapped invocaters of the functions `source.logHello` and `source.logWoah` to the element's `onclick` and `onchange` attribute 
+binds `source.userName` and `source.logHello` to the element's `onclick` attribute. If either changes, the `onclick` attribute will be reassigned to `source.logHello(source.userName, '!!!')`.
 
-for example, if `source.logHello = (name, punctuation) => { console.log('hi', name, punctuation) }` and `source.userName = 'kangaroo'`,
+for example, `source.logHello = (name, punctuation) => { console.log('hi', name, punctuation) }` and `source.userName = 'kangaroo'`.
 
-then sets element's onclick to `( (name, punctuation) => { console.log('hi', name, punctuation) } ) ('kangraoo', '!!!')` 
-
-this is a convenience syntax for the equally valid `onclick="(${logHello})('${username}', '!!!')"` syntax 
 
 ### expression binding
 
