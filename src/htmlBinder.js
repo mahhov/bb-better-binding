@@ -214,18 +214,7 @@ class HtmlBinder {
     applyBindAttributes(elem, attributeName, functionName, params) {
         if (functionName) {
             let handler = getValue(this.source, [functionName]);
-
-            let paramValues = params.map(param => { // extract
-                let sourceValue = getValue(this.source, [param]);
-                if (sourceValue !== undefined)
-                    return sourceValue;
-                try {
-                    return JSON.parse(param.replace(/'/g, '"'));
-                } catch (exception) {
-                    return undefined;
-                }
-            });
-
+            let paramValues = getParamValues(params);
             elem[attributeName] = () => handler(...paramValues);
             return;
         } // todo extract seperate function
@@ -264,16 +253,7 @@ class HtmlBinder {
             return getValue(this.source, [bindName]);
 
         let expression = getValue(this.source, [expressionName]);
-        let paramValues = params.map(param => {
-            let sourceValue = getValue(this.source, [param]);
-            if (sourceValue !== undefined)
-                return sourceValue;
-            try {
-                return JSON.parse(param.replace(/'/g, '"'));
-            } catch (exception) {
-                return undefined;
-            }
-        });
+        let paramValues = getParamValues(params);
         return typeof expression === 'function' && expression(...paramValues);
     }
 
@@ -288,6 +268,19 @@ class HtmlBinder {
 
     static getBindAttribute(elem, attribute) {
         return indexToDot(elem.getAttribute(attribute));
+    }
+
+    static getParamValues(params) {
+        return params.map(param => {
+            let sourceValue = getValue(this.source, [param]);
+            if (sourceValue !== undefined)
+                return sourceValue;
+            try {
+                return JSON.parse(param.replace(/'/g, '"'));
+            } catch (exception) {
+                return undefined;
+            }
+        });
     }
 }
 
