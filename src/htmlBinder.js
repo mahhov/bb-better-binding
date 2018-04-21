@@ -33,9 +33,13 @@ class HtmlBinder {
             for (let i = 0; i < attributes.length; i++) {
                 let {name: attributeName, value} = attributes[i];
 
-                let bindMatches = value.match(bindRegex);
-                if (bindMatches) {
+                if (value.match(bindRegex)) {
                     let attributeBind = this.addAttributeBind(elem, attributeName, value, sourceLinks);
+                    let {params} = attributeBind;
+                    this.applyBindAttributes(elem, attributeName, null, params);
+
+                } else if (value.match(/(\\)?\${([\w.[\]]+)\((.*)\)}/)) { // todo extract regex
+                    let attributeBind = this.addAttributeFunctionBind(elem, attributeName, value, sourceLinks);
                     let {functionName, params} = attributeBind;
                     this.applyBindAttributes(elem, attributeName, functionName, params);
                 }
@@ -160,18 +164,6 @@ class HtmlBinder {
     }
 
     addAttributeBind(elem, attributeName, value, sourceLinks) {
-        // let functionMatch = value.match(functionRegex);
-        // console.log(value, functionRegex);
-        // if (functionMatch) {
-        //     let [all, prefixSlash, functionName, params] = functionMatch;
-        //     functionName = translate(match, functionName);
-        //     // functionName = translate(match, functionName);
-        //     console.log(params);
-        //     // let attributeBind = {elem, attributeName, functionName, params};
-        //     // this.binds[bindName].attributes.push(attributeBind);
-        //     // return attributeBind;
-        // }
-
         let params = value.split(/((?:\\)?\${(?:[\w.[\]]+)})/) // todo extract to regex
             .map(param => {
                 let matchList = param.match(bindRegex);
@@ -193,6 +185,23 @@ class HtmlBinder {
         return attributeBind;
     }
 
+    addAttributeFunctionBind(elem, attributeName, value, sourceLinks) {
+        let [all, prefixSlash, functionName, paramsStr] = value.match(/(\\)?\${([\w.[\]]+)\((.*)\)}/); // todo prefixSlash
+        functionName = translate(functionName, sourceLinks);
+        let params = splitByParams(paramsStr)
+            .map(param => translate(param, sourceLinks));
+        let attributeBind = {elem, attributeName, functionName, params};
+
+        params
+            .forEach(bindName => {
+                this.createBind(bindName);
+                this.binds[bindName].attributes.push(attributeBind);
+            });
+
+        return attributeBind;
+        // todo prevent binding non source values
+    }
+
     addExpressionBind(bindName, elem, type, expressionValue) { // type = 'ifs' or 'values' 
         this.createBind(bindName);
         let binded = this.binds[bindName][type].some(otherBind =>
@@ -203,6 +212,24 @@ class HtmlBinder {
     }
 
     applyBindAttributes(elem, attributeName, functionName, params) {
+        if (functionName) {
+            let handler = getValue(this.source, [functionName]);
+
+            let paramValues = params.map(param => { // extract
+                let sourceValue = getValue(this.source, [param]);
+                if (sourceValue !== undefined)
+                    return sourceValue;
+                try {
+                    return JSON.parse(param.replace(/'/g, '"'));
+                } catch (exception) {
+                    return undefined;
+                }
+            });
+
+            elem[attributeName] = () => handler(...paramValues);
+            return;
+        } // todo extract seperate function
+
         let modifiedValue = params
             .map(param => param.sourceValue ? notUndefined(getValue(this.source, [param.sourceValue]), '') : param.stringValue)
             .reduce((a, b) => a + b);
@@ -303,7 +330,8 @@ class HtmlBinder {
 //     elem: elem1,
 //     attributeName,
 //     functionName, // can be null
-//     params: [{stringValue | sourceValue: string}]
+//     params: [{stringValue | sourceValue: string}], // for null functionName
+//     params: [] // for not null functionName
 // };
 //
 // expressionBind = {
