@@ -36,12 +36,12 @@ class HtmlBinder {
                 if (value.match(bindRegex)) {
                     let attributeBind = this.addAttributeBind(elem, attributeName, value, sourceLinks);
                     let {params} = attributeBind;
-                    this.applyBindAttributes(elem, attributeName, null, params);
+                    this.applyBindAttribute(elem, attributeName, params);
 
                 } else if (value.match(functionRegex)) {
                     let attributeBind = this.addAttributeFunctionBind(elem, attributeName, value, sourceLinks);
                     let {functionName, params} = attributeBind;
-                    this.applyBindAttributes(elem, attributeName, functionName, params);
+                    this.applyBindFunctionAttribute(elem, attributeName, functionName, params);
                 }
             }
 
@@ -123,7 +123,7 @@ class HtmlBinder {
             bind.values = bind.values.filter(({elem}) => this.root.contains(elem));
 
             bind.attributes.forEach(({elem, attributeName, functionName, params}) => {
-                this.applyBindAttributes(elem, attributeName, functionName, params);
+                functionName ? this.applyBindFunctionAttribute(elem, attributeName, functionName, params) : this.applyBindAttribute(elem, attributeName, params);
             });
 
             bind.fors.forEach(({container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
@@ -211,18 +211,17 @@ class HtmlBinder {
         // todo prevent binding non source values
     }
 
-    applyBindAttributes(elem, attributeName, functionName, params) {
-        if (functionName) {
-            let handler = getValue(this.source, [functionName]);
-            let paramValues = getParamValues(params);
-            elem[attributeName] = () => handler(...paramValues);
-            return;
-        } // todo extract seperate function
-
+    applyBindAttribute(elem, attributeName, params) {
         let modifiedValue = params
             .map(param => param.sourceValue ? notUndefined(getValue(this.source, [param.sourceValue]), '') : param.stringValue)
             .reduce((a, b) => a + b);
         elem.setAttribute(attributeName, modifiedValue);
+    }
+
+    applyBindFunctionAttribute(elem, attributeName, functionName, params) {
+        let handler = getValue(this.source, [functionName]);
+        let paramValues = this.getParamValues(params);
+        elem[attributeName] = () => handler(...paramValues);
     }
 
     applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
@@ -253,8 +252,21 @@ class HtmlBinder {
             return getValue(this.source, [bindName]);
 
         let expression = getValue(this.source, [expressionName]);
-        let paramValues = getParamValues(params);
+        let paramValues = this.getParamValues(params);
         return typeof expression === 'function' && expression(...paramValues);
+    }
+
+    getParamValues(params) {
+        return params.map(param => {
+            let sourceValue = getValue(this.source, [param]);
+            if (sourceValue !== undefined)
+                return sourceValue;
+            try {
+                return JSON.parse(param.replace(/'/g, '"'));
+            } catch (exception) {
+                return undefined;
+            }
+        });
     }
 
     static replaceInlineBindings(elem) {
@@ -268,19 +280,6 @@ class HtmlBinder {
 
     static getBindAttribute(elem, attribute) {
         return indexToDot(elem.getAttribute(attribute));
-    }
-
-    static getParamValues(params) {
-        return params.map(param => {
-            let sourceValue = getValue(this.source, [param]);
-            if (sourceValue !== undefined)
-                return sourceValue;
-            try {
-                return JSON.parse(param.replace(/'/g, '"'));
-            } catch (exception) {
-                return undefined;
-            }
-        });
     }
 }
 
