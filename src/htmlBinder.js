@@ -227,7 +227,7 @@ class HtmlBinder {
     applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
         HtmlBinder.removeAllChildren(container);
         let value = getValue(this.source, [sourceFrom]);
-        if (value && value.length)
+        if (value && Array.isArray(value))
             value.forEach((_, index) => {
                 let childElem = document.createElement('div');
                 childElem.innerHTML = outerHtml;
