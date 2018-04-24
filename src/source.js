@@ -4,16 +4,17 @@ let createSource = () => {
     return {source, handlers};
 };
 
-let createProxy = (obj, handlers) => new Proxy(obj, {
+let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
     get: (target, prop) => {
         let got = Reflect.get(target, prop);
-        return typeof got === 'object' && got !== null ? createProxy(got, handlers && handlers[prop]) : got;
+        return typeof got === 'object' && got !== null ? createProxy(got, handlers && handlers[prop], accumulatedHandlers.concat(handlers)) : got;
     },
     set: (target, prop, value) => {
         if (Reflect.get(target, prop) !== value) {
             Reflect.set(target, prop, value);
-
-            handlers && propogateHandlerDown(handlers);
+            accumulatedHandlers.forEach(doHandler);
+            doHandler(handlers);
+            handlers && propogateHandlerDown(handlers[prop]);
         }
         return true;
     }
@@ -23,12 +24,16 @@ let propogateHandlerDown = handlers => {
     if (!handlers)
         return;
 
-    if (typeof handlers._func_ === 'function')
-        handlers._func_();
+    doHandler(handlers);
 
     for (key in handlers)
         if (key !== '_func_')
             propogateHandlerDown(handlers[key]);
+};
+
+let doHandler = handler => {
+    if (typeof handler._func_ === 'function')
+        handler._func_();
 };
 
 module.exports = {createSource};
