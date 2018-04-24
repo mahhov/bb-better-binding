@@ -21,18 +21,14 @@ let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
 });
 
 let propogateHandlerDown = handlers => {
-    if (!handlers)
-        return;
-
     doHandler(handlers);
-
     for (key in handlers)
         if (key !== '_func_')
             propogateHandlerDown(handlers[key]);
 };
 
 let doHandler = handler => {
-    if (typeof handler._func_ === 'function')
+    if (handler && typeof handler._func_ === 'function')
         handler._func_();
 };
 
