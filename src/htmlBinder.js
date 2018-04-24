@@ -193,6 +193,9 @@ class HtmlBinder {
             .map(param => translate(param, sourceLinks));
         let attributeBind = {elem, attributeName, functionName, params};
 
+        this.createBind(functionName);
+        this.binds[functionName].attributes.push(attributeBind);
+
         params
             .forEach(bindName => {
                 this.createBind(bindName);
