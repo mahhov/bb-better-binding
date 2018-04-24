@@ -15,6 +15,7 @@ class HtmlBinder {
         this.root = root.children[0];
         HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
+        window.binds = this.binds;
     }
 
     bindElem(elem, sourceLinks, linkBaseDir) {

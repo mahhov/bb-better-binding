@@ -10,12 +10,10 @@ let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
         return typeof got === 'object' && got !== null ? createProxy(got, handlers && handlers[prop], accumulatedHandlers.concat(handlers)) : got;
     },
     set: (target, prop, value) => {
-        if (Reflect.get(target, prop) !== value) {
-            Reflect.set(target, prop, value);
-            accumulatedHandlers.forEach(doHandler);
-            doHandler(handlers);
-            handlers && propogateHandlerDown(handlers[prop]);
-        }
+        Reflect.set(target, prop, value);
+        accumulatedHandlers.forEach(doHandler);
+        doHandler(handlers);
+        handlers && propogateHandlerDown(handlers[prop]);
         return true;
     }
 });
