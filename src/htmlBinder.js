@@ -229,16 +229,18 @@ class HtmlBinder {
     }
 
     applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
-        HtmlBinder.removeAllChildren(container);
         let value = getValue(this.source, [sourceFrom]);
-        if (value && Array.isArray(value))
-            value.forEach((_, index) => {
+        if (value && Array.isArray(value)) {
+            while (container.childElementCount > value.length)
+                container.removeChild(container.lastElementChild);
+            for (let index = container.childElementCount; index < value.length; index++) {
                 let childElem = document.createElement('div');
                 childElem.innerHTML = outerHtml;
                 sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
-            });
+            }
+        }
     }
 
     applyBindIf(elem, expressionName, params, bindName) {
@@ -275,11 +277,6 @@ class HtmlBinder {
 
     static replaceInlineBindings(elem) {
         elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefix, match) => prefix ? all.substr(1) : `<span bind="${match}"></span>`);
-    }
-
-    static removeAllChildren(elem) {
-        while (elem.firstElementChild)
-            elem.removeChild(elem.firstElementChild);
     }
 
     static getBindAttribute(elem, attribute) {
