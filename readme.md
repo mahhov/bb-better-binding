@@ -139,3 +139,5 @@ for example, `source.logHello = (name, punctuation) => { console.log('hi', name,
 binds `source.value` and `source.equals` to the `bind-if` binding. If either changes, the expression will be reevaluated.
 
 for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, then the `div` will be visible. 
+
+`$s{x(y)}` is a shorthand for `<span bind="$e{x(y)}"> </span>`.

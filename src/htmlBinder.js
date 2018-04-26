@@ -2,7 +2,7 @@ const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
-const {spanRegex, allSpanRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
+const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
 
 class HtmlBinder {
 
@@ -276,7 +276,8 @@ class HtmlBinder {
     }
 
     static replaceInlineBindings(elem) {
-        elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefix, match) => prefix ? all.substr(1) : `<span bind="${match}"></span>`);
+        elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefixSlash, match) => prefixSlash ? all.substr(1) : `<span bind="${match}"></span>`);
+        elem.innerHTML = elem.innerHTML.replace(allSpanExpressionRegex, (all, prefixSlash, match) => prefixSlash ? all.substr(1) : `<span bind="$e{${match}}"></span>`);
     }
 
     static getBindAttribute(elem, attribute) {
@@ -334,5 +335,4 @@ class HtmlBinder {
 //     bindName // can be null
 // };
 
-module
-    .exports = (dir, document) => new HtmlBinder(dir, document).source;
+module.exports = (dir, document) => new HtmlBinder(dir, document).source;
