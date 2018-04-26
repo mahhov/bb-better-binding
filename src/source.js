@@ -4,6 +4,8 @@ let createSource = () => {
     return {source, handlers};
 };
 
+let ignore = [];
+
 let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
     get: (target, prop) => {
         let got = Reflect.get(target, prop);
@@ -11,11 +13,19 @@ let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
     },
     set: (target, prop, value) => {
         Reflect.set(target, prop, value);
-        if (obj.__bindignore__ && obj.__bindignore__.includes(prop))
+
+        if (obj.__bindIgnore__ && obj.__bindIgnore__.includes(prop))
             return true;
+
+        if (obj.__bindAvoidCycles__ && ignore.some(ignore => ignore.target === target && ignore.prop === prop))
+            return true;
+
+        ignore.push({target, prop, value});
         accumulatedHandlers.forEach(doHandler);
         doHandler(handlers);
         handlers && propogateHandlerDown(handlers[prop]);
+        ignore.pop();
+
         return true;
     }
 });
