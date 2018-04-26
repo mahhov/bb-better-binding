@@ -11,6 +11,8 @@ let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
     },
     set: (target, prop, value) => {
         Reflect.set(target, prop, value);
+        if (obj.__bindignore__ && obj.__bindignore__.includes(prop))
+            return true;
         accumulatedHandlers.forEach(doHandler);
         doHandler(handlers);
         handlers && propogateHandlerDown(handlers[prop]);
