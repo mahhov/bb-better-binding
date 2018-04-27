@@ -146,11 +146,14 @@ class HtmlBinder {
         if (expressionMatch) {
             let [, , expressionName, paramsStr] = expressionMatch;
             expressionName = translate(expressionName, sourceLinks);
-            let params = splitByParams(paramsStr)
+            let params = splitByParams(paramsStr);
+            let bindParams = params.filter(param => param[0] !== '_');
+            params = params
+                .map(param => param[0] === '_' ? param.substr(1) : param)
                 .map(param => translate(param, sourceLinks));
             let expressionValue = {elem, expressionName, params};
             this.addExpressionBind(expressionName, elem, type, expressionValue);
-            params
+            bindParams
                 .forEach(param => {
                     this.addExpressionBind(param, elem, type, expressionValue);
                 });
