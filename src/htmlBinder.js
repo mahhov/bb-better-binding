@@ -1,4 +1,4 @@
-const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma} = require('./objScafolding');
+const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
@@ -227,8 +227,10 @@ class HtmlBinder {
 
     applyBindFunctionAttribute(elem, attributeName, functionName, params) {
         let handler = getValue(this.source, [functionName]);
-        let paramValues = this.getParamValues(params);
-        elem[attributeName] = () => handler(...paramValues);
+        elem[attributeName] = () => {
+            let paramValues = this.getParamValues(params, elem);
+            handler.apply(elem, paramValues);
+        };
     }
 
     applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
@@ -247,31 +249,39 @@ class HtmlBinder {
     }
 
     applyBindIf(elem, expressionName, params, bindName) {
-        let value = this.obtainExpressionValue(expressionName, params, bindName);
+        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
         elem.hidden = !value;
     }
 
     applyBindValue(elem, expressionName, params, bindName) {
-        let value = this.obtainExpressionValue(expressionName, params, bindName);
+        let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
         elem.innerHTML = notUndefined(value);
     }
 
-    obtainExpressionValue(expressionName, params, bindName) {
+    obtainExpressionValue(elem, expressionName, params, bindName) {
         if (!expressionName)
             return getValue(this.source, [bindName]);
 
         let expression = getValue(this.source, [expressionName]);
-        let paramValues = this.getParamValues(params);
+        let paramValues = this.getParamValues(params, elem);
         return typeof expression === 'function' && expression(...paramValues);
     }
 
-    getParamValues(params) {
+    getParamValues(params, thiss) {
         return params.map(param => {
+            let paramPath = param.split('.');
+            if (paramPath[0] === 'this') {
+                paramPath.shift();
+                return getValue(thiss, paramPath);
+            }
+
             let sourceValue = getValue(this.source, [param]);
             if (sourceValue !== undefined)
                 return sourceValue;
+
             try {
                 return JSON.parse(param.replace(/'/g, '"'));
+
             } catch (exception) {
                 return undefined;
             }
