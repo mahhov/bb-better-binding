@@ -134,13 +134,13 @@ for example, `source.logHello = (name, punctuation) => { console.log('hi', name,
 
 ### expression binding
 
-`<div bind-if="$e{equals(value, 3)}"> $s{value} </div> `
+`<div bind-if="${equals(value, 3)}"> $s{value} </div> `
 
 binds `source.value` and `source.equals` to the `bind-if` binding. If either changes, the expression will be reevaluated.
 
 for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, then the `div` will be visible. 
 
-`$s{x(y)}` is a shorthand for `<span bind="$e{x(y)}"> </span>`.
+`$s{x(y)}` is a shorthand for `<span bind="${x(y)}"> </span>`.
 
 ### avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
 

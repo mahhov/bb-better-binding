@@ -10,6 +10,6 @@ let bindRegexUncapturing = /((?:\\)?\${(?:[\w.[\]]+)})/;
 
 let functionRegex = /(\\)?\${([\w.[\]]+)\((.*)\)}/;
 
-let expressionRegex = /(\\)?\$e{([\w.[\]]+)\((.*)\)}/;
+let expressionRegex = /(\\)?([\w.[\]]+)\((.*)\)/;
 
 module.exports = {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex};
