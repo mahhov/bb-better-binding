@@ -9,3 +9,7 @@ module.exports = (dir, root) => htmlBinder(dir, root);
 // allow defining and using components in any order
 // allow using expressions for more binds than just ifs and values (e.g. attributes, fors, as, use)
 // support $e nested inside $s
+// investigate why source.a = source.b doesn't propogate changes
+// investigate why bind-for indexVars don't propogate changes
+// investigate how to set setters on non-source object assignments
+// routing or swapping states
