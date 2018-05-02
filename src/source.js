@@ -1,13 +1,11 @@
 let createSource = handlers => {
     let origin = {};
-    let source = createProxy(origin, handlers);
-    watchAll(origin, handlers, []); // todo move to createProxy? 
-    return source;
+    watchAll(origin, handlers, []);
+    return createProxy(origin, handlers);
 };
 
-let getHandler = (got, handlers, accumulatedHandlers) => {
-    return typeof got === 'object' && got ? createProxy(got, handlers, accumulatedHandlers) : got;
-};
+let getHandler = (got, handlers, accumulatedHandlers) =>
+    typeof got === 'object' && got ? createProxy(got, handlers, accumulatedHandlers) : got;
 
 let setHandler = (prop, handlers, accumulatedHandlers) => {
     accumulatedHandlers.forEach(doHandler);
@@ -35,12 +33,9 @@ let propogateHandlerDown = handlers => {
         .forEach(([key, handler]) => propogateHandlerDown(handler));
 };
 
-let doHandler = handler => {
-    if (handler && typeof handler._func_ === 'function')
-        handler._func_();
-};
+let doHandler = handler => handler && typeof handler._func_ === 'function' && handler._func_();
 
-let watchAll = (origin, handlers, accumulatedHandlers) => {
+let watchAll = (origin, handlers, accumulatedHandlers) =>
     Object.entries(handlers)
         .filter(([key]) => key !== '_func_')
         .forEach(([key, handler]) => {
@@ -54,14 +49,12 @@ let watchAll = (origin, handlers, accumulatedHandlers) => {
                     setHandler(key, handler, nextAccumulatedHandlers)
                 });
         });
-};
 
-let watch = (obj, key, getHandler, setHandler) => {
+let watch = (obj, key, getHandler, setHandler) =>
     Object.defineProperty(obj, key, {
         get: () => getHandler(),
         set: newValue => setHandler(newValue),
         configurable: true
     });
-};
 
 module.exports = {createSource};
