@@ -16,6 +16,11 @@ class HtmlBinder {
         HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
         this.source = createSourceWithHandlers(this.handlers); // todo dont create 2 sources
+        if (window) {
+            window.source = this.source;
+            window.binds = this.binds;
+            window.handlers = this.handlers;
+        }
     }
 
     bindElem(elem, sourceLinks, linkBaseDir) {
