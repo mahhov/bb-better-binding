@@ -144,7 +144,7 @@ for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, th
 
 ### avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
 
-Imagine you have the following in your template template `$s{func(obj)}`, and the following controller, 
+Imagine you have the following in your template `$s{func(obj)}`, and the following controller, 
 
 ```js
 source.obj = {
