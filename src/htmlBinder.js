@@ -1,6 +1,6 @@
 const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
 const splitByParams = require('./paramSplitter');
-const {createSource, createSourceWithHandlers} = require('./source');
+const {createSource} = require('./source');
 const fileReader = require('./fileReader');
 const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
 
@@ -8,14 +8,13 @@ class HtmlBinder {
 
     constructor(dir, root) {
         this.binds = {};
-        let {source, handlers} = createSource();
-        this.source = source;
-        this.handlers = handlers;
+        this.source = {}; // todo is this necessary
+        this.handlers = {};
         this.components = {};
         this.root = root.children[0];
         HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
-        this.source = createSourceWithHandlers(this.handlers); // todo dont create 2 sources
+        this.source = createSource(this.handlers);
         if (window) {
             window.source = this.source;
             window.binds = this.binds;

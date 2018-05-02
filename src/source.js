@@ -1,12 +1,4 @@
-let createSource = () => {
-    let handlers = {};
-    let origin = {};
-    let source = createProxy(origin, handlers);
-    watchAll(origin, handlers, []); // todo move to createProxy? 
-    return {source, handlers};
-};
-
-let createSourceWithHandlers = handlers => {
+let createSource = handlers => {
     let origin = {};
     let source = createProxy(origin, handlers);
     watchAll(origin, handlers, []); // todo move to createProxy? 
@@ -72,4 +64,4 @@ let watch = (obj, key, getHandler, setHandler) => {
     });
 };
 
-module.exports = {createSource, createSourceWithHandlers};
+module.exports = {createSource};
