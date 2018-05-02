@@ -73,3 +73,5 @@ let splitByComma = string =>
 module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma};
 
 // todo split up into multiple files
+
+// todo fix bug with getValue({obj: {inner: {x: 10 } } }, ["obj.inner.nest.x"])

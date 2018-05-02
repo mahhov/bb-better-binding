@@ -1,61 +1,53 @@
 let createSource = () => {
     let handlers = {};
-    let source = createProxy({}, handlers);
+    let origin = {};
+    let source = createProxy(origin, handlers);
+    watchAll(origin, handlers, []); // todo move to createProxy? 
     return {source, handlers};
 };
 
-let ignore = [];
-
-let isBindIgnored = (obj, prop) => obj.__bindIgnore__ && obj.__bindIgnore__.includes(prop);
-
-let proxyGet = (target, prop, obj, handlers, accumulatedHandlers) => {
-    let got = Reflect.get(target, prop);
-    return typeof got === 'object' && got !== null && !isBindIgnored(obj, prop) ? createProxy(got, handlers && handlers[prop], accumulatedHandlers.concat(handlers)) : got;
+let createSourceWithHandlers = handlers => {
+    let origin = {};
+    let source = createProxy(origin, handlers);
+    watchAll(origin, handlers, []); // todo move to createProxy? 
+    return source;
 };
 
-let proxySet = (target, prop, value, obj, handlers, accumulatedHandlers) => {
-    if (isBindIgnored(obj, prop))
-        return true;
+let proxyGet = (got, handlers, accumulatedHandlers) => {
+    return typeof got === 'object' && got ? createProxy(got, handlers, accumulatedHandlers) : got;
+};
 
-    // todo make __bindAvoidCycles__ inherited and maybe avoid per binding instead per change
-    if (obj.__bindAvoidCycles__ && ignore.some(ignore => ignore.obj === obj && ignore.prop === prop))
-        return true;
-
-    ignore.push({prop, obj});
+let proxySet = (prop, handlers, accumulatedHandlers) => {
+    console.log('>>>> handler set', prop, handlers, accumulatedHandlers);
     accumulatedHandlers.forEach(doHandler);
-    doHandler(handlers);
-    handlers && propogateHandlerDown(handlers[prop]);
-    ignore.pop();
+    handlers && propogateHandlerDown(handlers);
 };
 
 let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
     get: (target, prop) => {
-        return proxyGet(target, prop, obj, handlers, accumulatedHandlers);
+        return Reflect.get(target, prop);
     },
     set: (target, prop, value) => {
-        if (value && typeof value === 'object' && handlers && handlers[prop])
-            Object.entries(handlers[prop]).forEach(([key, handlerValue]) => {
-                if (key !== '_func_') {
-                    let watchKey = `_${key}_`;
-                    value[watchKey] = value[key];
-                    watch(value, key, () => {
-                        proxyGet(target, prop, obj, handlers, accumulatedHandlers);
-                        return value[watchKey];
-                    }, newValue => {
-                        value[watchKey] = newValue;
-                        proxySet(target, prop, value, obj, handlers, accumulatedHandlers)
-                    });
-                }
-            });
+        if (value && typeof value === 'object' && handlers && handlers[prop]) {
+            let specialHandler = handlers[prop];
+            let specialAccumulatedHandlers = accumulatedHandlers.concat(handlers);
+            watchAll(value, specialHandler, specialAccumulatedHandlers);
+        }
 
-        Reflect.set(target, prop, value); // move this?
-        proxySet(target, prop, value, obj, handlers, accumulatedHandlers);
+        Reflect.set(target, prop, value);
         return true;
     }
 });
 
 let propogateHandlerDown = handlers => {
     doHandler(handlers);
+
+    // Object.entries(handlers);
+    //     .filter(([key]) => key !== '_func_')
+    //     .forEach(([key, handlerValue]) => {
+    //     });
+    // todo is this better than `for in`?
+
     for (key in handlers)
         if (key !== '_func_')
             propogateHandlerDown(handlers[key]);
@@ -66,8 +58,22 @@ let doHandler = handler => {
         handler._func_();
 };
 
-let watchAll = () => {
-    // todo bring logic from set to here
+let watchAll = (origin, handlers, accumulatedHandlers) => {
+    Object.entries(handlers)
+        .filter(([key]) => key !== '_func_')
+        .forEach(([key, handlerValue]) => {
+            let nextHandler = handlers[key];
+            let nextAccumulatedHandlers = accumulatedHandlers.concat(handlers);
+            let watchKey = `_${key}_`;
+            origin[watchKey] = origin[key];
+            watch(origin, key, () => {
+                let got = origin[watchKey];
+                return proxyGet(got, nextHandler, nextAccumulatedHandlers);
+            }, newValue => {
+                origin[watchKey] = newValue;
+                proxySet(key, nextHandler, nextAccumulatedHandlers)
+            });
+        });
 };
 
 let watch = (obj, key, getHandler, setHandler) => {
@@ -78,4 +84,6 @@ let watch = (obj, key, getHandler, setHandler) => {
     });
 };
 
-module.exports = {createSource};
+module.exports = {createSource, createSourceWithHandlers};
+
+// todo remove clogs, 1 line lambdas, move out watchAll
