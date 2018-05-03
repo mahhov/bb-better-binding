@@ -2,9 +2,7 @@ let getProperty = (obj, paths) => {
     let fields = getFields(paths);
     let lastField = fields.pop();
     fields.forEach(field => {
-        if (!obj[field])
-            return [{}, null];
-        obj = obj[field];
+        obj = obj[field] || {};
     });
     return [obj, lastField];
 };
@@ -17,9 +15,7 @@ let getValue = (obj, paths) => {
 let createProperty = (obj, paths) => {
     let fields = getFields(paths);
     let lastField = fields.pop();
-    fields.forEach(field => {
-        obj = obj[field] = obj[field] || {};
-    });
+    fields.forEach(field => obj = obj[field] = obj[field] || {});
     return [obj, lastField];
 };
 
@@ -61,6 +57,6 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
-module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined};
+module.exports = {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined};
 
 // todo fix bug with getValue({obj: {inner: {x: 10 } } }, ["obj.inner.nest.x"])
