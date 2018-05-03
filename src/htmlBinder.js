@@ -8,7 +8,7 @@ class HtmlBinder {
 
     constructor(dir, root) {
         this.binds = {};
-        this.source = {}; // todo is this necessary
+        this.source = {};
         this.handlers = {};
         this.components = {};
         this.root = root.children[0];
