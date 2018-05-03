@@ -61,15 +61,4 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
-let splitByWord = (string, word) =>
-    string.split(new RegExp(`\\s+${word}\\s+`));
-
-let splitBySpace = string =>
-    string.split(new RegExp(/\s+/));
-
-let splitByComma = string =>
-    string.split(new RegExp(/\s*,\s*/));
-
-module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined, splitByWord, splitBySpace, splitByComma};
-
-// todo split up into multiple files
+module.exports = {getProperty, getValue, createProperty, setProperty, clone, modify, translate, getFields, indexToDot, notUndefined};

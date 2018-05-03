@@ -1,4 +1,5 @@
-const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined, splitByWord, splitBySpace} = require('./objScafolding');
+const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined} = require('./objScafolding');
+const {splitByWord, splitBySpace} = require('./stringSplitter');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
