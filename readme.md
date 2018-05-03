@@ -62,7 +62,7 @@ source.overdueBooks = [{
 source.fontSize = '30';
 ```
 
-## HTML syntax
+## Syntax
 
 ### bind value
 
@@ -142,7 +142,7 @@ for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, th
 
 `$s{x(y)}` is a shorthand for `<span bind="${x(y)}"> </span>`.
 
-### avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
+## avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
 
 Imagine you have the following in your template `$s{func(obj)}`, and the following controller, 
 
@@ -160,7 +160,7 @@ source.func = obj => {
 
 This results in both `source.func` and `source.obj` binding to the span's value binding. In other words, whenever either changes, the value binding (`source.func(source.obj)`) is invoked. The problem here is that `source.func` will modify `source.obj` when it increments `count`, resulting in an infinite cycle of the binding being invoked because `source.obj` is modified, and `source.obj` being modified because the binding is invoked.
 
-#### option 1, `__bindIgnore__`
+### option 1, `__bindIgnore__`
 
 One solution is to ignore the fields that don't need to trigger bindings: `source.obj.__bindIgnore__ = ['count']`. Any field names in the list `__bindIgnore__`  will not trigger any bindings when modified. So as long as `source.obj.__bindIgnore__` includes `count`, we can modify `count` and no bindings will be triggered. `__bindIgnore__` can be modified as needed in order to ignore certain fields only under certain conditions.
 
@@ -185,7 +185,7 @@ source.func = obj => {
 };
 ```
 
-#### option 2, `__bindAvoidCycles__`
+### option 2, `__bindAvoidCycles__`
 
 What if our template relies on `count` as well: `$s{obj.count}`? Then we no longer want to ignore updates to `source.obj.count`, and `__bindIgnore__` is not a satisfactory solution in this case. An alternative way to avoid bindings from triggering is setting `source.obj.__bindAvoidCycles__ = true`. This will ensure each time `source.obj` is changed, it will trigger each of it's binding at most once per change. E.g. creating a new field `source.obj.newValue = 200` will trigger `source.func(source.obj)` once for the assignment of `newValue`, and once more for the increment of `obj.count`.
 
@@ -211,7 +211,7 @@ source.func = obj => {
 };
 ```
 
-#### option 3, `_`
+### option 3, `_`
 
 Yet a third option is to specify paramters with a `_` prefix in the template `$s{func(_obj, obj.value)}`. This allows individually configuring each bind with which `source` fields are binded to it. In the above example, `source.func` will only be invoked when `obj.value` is modified, but not when `source.obj` is modified. This allows you to use `$s{obj.count}` elsewhere in you template, because the `_` is applied to each paramter in each binding individually.
 
@@ -235,3 +235,24 @@ source.func = obj => {
     return obj.value;
 };
 ```
+
+## Triggering bindings
+
+Prior, to version `4.0.0`, bindings were designed to only trigger when `source` was modified. As of `4.0.0`, objectes assigned to `source` will be watched for changes to fields that are bound and trigger bindings appropriately.
+
+```html
+$s{obj.value1}
+$s{obj.value2}
+$s{obj.value3}
+```
+
+```js
+let obj = {value1: 1, value2: 2, value3: 3};
+source.obj = obj;
+source.obj.value2 = 22;
+obj.value3 = 33;
+```
+
+The example above previously displayed `1`, `22`, and `3`. The last assignment `obj.value3 = 33` would not trigger the `obj.value3` binding.
+
+As of `4.0.0`, assignments to both `source` and objects bound to source like `obj` will trigger bindings; the displayed values will be `1`, `22`, and `33`.
