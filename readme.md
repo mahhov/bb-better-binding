@@ -160,7 +160,7 @@ source.func = obj => {
 
 This results in both `source.func` and `source.obj` binding to the span's value binding. In other words, whenever either changes, the value binding (`source.func(source.obj)`) is invoked. The problem here is that `source.func` will modify `source.obj` when it increments `count`, resulting in an infinite cycle of the binding being invoked because `source.obj` is modified, and `source.obj` being modified because the binding is invoked.
 
-### option 1, `__bindIgnore__`
+### option 1, `__bindIgnore__`  (not available in version `4.0.0`)
 
 One solution is to ignore the fields that don't need to trigger bindings: `source.obj.__bindIgnore__ = ['count']`. Any field names in the list `__bindIgnore__`  will not trigger any bindings when modified. So as long as `source.obj.__bindIgnore__` includes `count`, we can modify `count` and no bindings will be triggered. `__bindIgnore__` can be modified as needed in order to ignore certain fields only under certain conditions.
 
@@ -185,7 +185,7 @@ source.func = obj => {
 };
 ```
 
-### option 2, `__bindAvoidCycles__`
+### option 2, `__bindAvoidCycles__` (not available in version `4.0.0`)
 
 What if our template relies on `count` as well: `$s{obj.count}`? Then we no longer want to ignore updates to `source.obj.count`, and `__bindIgnore__` is not a satisfactory solution in this case. An alternative way to avoid bindings from triggering is setting `source.obj.__bindAvoidCycles__ = true`. This will ensure each time `source.obj` is changed, it will trigger each of it's binding at most once per change. E.g. creating a new field `source.obj.newValue = 200` will trigger `source.func(source.obj)` once for the assignment of `newValue`, and once more for the increment of `obj.count`.
 
