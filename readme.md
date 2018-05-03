@@ -236,9 +236,11 @@ source.func = obj => {
 };
 ```
 
-## Triggering bindings
+## Triggering bindings changes in version `4.0.0`
 
-Prior, to version `4.0.0`, bindings were designed to only trigger when `source` was modified. As of `4.0.0`, objectes assigned to `source` will be watched for changes to fields that are bound and trigger bindings appropriately.
+### 1
+
+Prior, to version `4.0.0`, bindings were designed to only trigger when `source` was modified. As of `4.0.0`, objects assigned to `source` will be watched for changes to fields that are bound and trigger bindings appropriately.
 
 ```html
 $s{obj.value1}
@@ -256,3 +258,22 @@ obj.value3 = 33;
 The example above previously displayed `1`, `22`, and `3`. The last assignment `obj.value3 = 33` would not trigger the `obj.value3` binding.
 
 As of `4.0.0`, assignments to both `source` and objects bound to source like `obj` will trigger bindings; the displayed values will be `1`, `22`, and `33`.
+
+### 2
+
+Prior to version `4.0.0`, bindings were triggered when any property on a bound object changed. As of `4.0.0`, only properties directly bound will trigger bindings. The difference is noticeable when working with `for` bindings and growing or shrinking arrays.
+
+```html
+<div bind-for="item in list">
+    $s{item}
+</div>
+```
+
+```js
+source.list = [10, 20, 30];
+source.list.push(40);
+```
+
+The example above previously displayed `10`, `20`, `30`, and `40`. The `push` would trigger a bindings on `list`, as both the `length` and `3` properties of `list` are modified.
+
+As of `4.0.0`, only the `0`, `1`, and `2` properties of `list` are observed for changes; the displayed values will be `10`, `20`, and `30`.
