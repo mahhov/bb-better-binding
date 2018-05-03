@@ -1,6 +1,5 @@
 let createSource = handlers => {
     let origin = {};
-    watchAll(origin, handlers, []);
     return createProxy(origin, handlers);
 };
 
@@ -12,18 +11,21 @@ let setHandler = (prop, handlers, accumulatedHandlers) => {
     handlers && propogateHandlerDown(handlers); // todo which handler null checks r necessary
 };
 
-let createProxy = (obj, handlers, accumulatedHandlers = []) => new Proxy(obj, {
-    get: (target, prop) =>
-        Reflect.get(target, prop),
+let createProxy = (obj, handlers, accumulatedHandlers = []) => {
+    watchAll(obj, handlers, accumulatedHandlers);
+    return new Proxy(obj, {
+        get: (target, prop) =>
+            Reflect.get(target, prop),
 
-    set: (target, prop, value) => {
-        if (value && typeof value === 'object' && handlers && handlers[prop])
-            watchAll(value, handlers[prop], accumulatedHandlers.concat(handlers));
+        set: (target, prop, value) => {
+            if (value && typeof value === 'object' && handlers && handlers[prop])
+                watchAll(value, handlers[prop], accumulatedHandlers.concat(handlers));
 
-        Reflect.set(target, prop, value);
-        return true;
-    }
-});
+            Reflect.set(target, prop, value);
+            return true;
+        }
+    });
+};
 
 let propogateHandlerDown = handlers => {
     doHandler(handlers);
