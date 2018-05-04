@@ -152,7 +152,9 @@ class HtmlBinder {
             let [, , expressionName, paramsStr] = expressionMatch;
             expressionName = translate(expressionName, sourceLinks);
             let params = splitByParams(paramsStr);
-            let bindParams = params.filter(param => param[0] !== '_');
+            let bindParams = params
+                .filter(param => param[0] !== '_')
+                .map(param => translate(param, sourceLinks));
             params = params
                 .map(param => param[0] === '_' ? param.substr(1) : param)
                 .map(param => translate(param, sourceLinks));
