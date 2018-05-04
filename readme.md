@@ -160,7 +160,7 @@ source.func = obj => {
 
 This results in both `source.func` and `source.obj` binding to the span's value binding. In other words, whenever either changes, the value binding (`source.func(source.obj)`) is invoked. The problem here is that `source.func` will modify `source.obj` when it increments `count`, resulting in an infinite cycle of the binding being invoked because `source.obj` is modified, and `source.obj` being modified because the binding is invoked.
 
-### option 1, `__bindIgnore__`  (not available in version `4.0.0`)
+### option 1, `__bindIgnore__`  (not available in version `4.x.x`)
 
 One solution is to ignore the fields that don't need to trigger bindings: `source.obj.__bindIgnore__ = ['count']`. Any field names in the list `__bindIgnore__`  will not trigger any bindings when modified. So as long as `source.obj.__bindIgnore__` includes `count`, we can modify `count` and no bindings will be triggered. `__bindIgnore__` can be modified as needed in order to ignore certain fields only under certain conditions.
 
@@ -185,7 +185,7 @@ source.func = obj => {
 };
 ```
 
-### option 2, `__bindAvoidCycles__` (not available in version `4.0.0`)
+### option 2, `__bindAvoidCycles__` (not available in version `4.x.x`)
 
 What if our template relies on `count` as well: `$s{obj.count}`? Then we no longer want to ignore updates to `source.obj.count`, and `__bindIgnore__` is not a satisfactory solution in this case. An alternative way to avoid bindings from triggering is setting `source.obj.__bindAvoidCycles__ = true`. This will ensure each time `source.obj` is changed, it will trigger each of it's binding at most once per change. E.g. creating a new field `source.obj.newValue = 200` will trigger `source.func(source.obj)` once for the assignment of `newValue`, and once more for the increment of `obj.count`.
 
@@ -236,7 +236,7 @@ source.func = obj => {
 };
 ```
 
-## Triggering bindings changes in version `4.0.0`
+## Triggering bindings changes in version `4.x.x`
 
 ### 1
 
@@ -277,3 +277,7 @@ source.list.push(40);
 The example above previously displayed `10`, `20`, `30`, and `40`. The `push` would trigger a bindings on `list`, as both the `length` and `3` properties of `list` are modified.
 
 As of `4.0.0`, only the `0`, `1`, and `2` properties of `list` are observed for changes; the displayed values will be `10`, `20`, and `30`.
+
+### Version `5.x.x+`
+
+Version `5.x.x` reverts the changes to binding triggering which were introduced in versions `4.0.0`. In this way, version `5.0.0` and future versions will behave similalry to versions prior to `4.0.0`. 

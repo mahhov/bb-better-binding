@@ -46,6 +46,3 @@ let doHandler = handler => {
 };
 
 module.exports = {createSource};
-
-
-// todo obj = {}; source.obj = obj; obj.inner = {}; obj.inner.nest = {x : 5}
