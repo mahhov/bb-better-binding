@@ -27,6 +27,7 @@ class HtmlBinder {
         let skip = false;
 
         if (elem.getAttribute) {
+            let bindElem = HtmlBinder.getBindAttribute(elem, 'bind-elem');
             let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
             let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
             let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
@@ -50,6 +51,9 @@ class HtmlBinder {
                     this.applyBindFunctionAttribute(elem, attributeName, functionName, params);
                 }
             }
+
+            if (bindElem)
+                setProperty(this.source, [bindElem], elem);
 
             if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);

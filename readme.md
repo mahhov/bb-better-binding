@@ -142,6 +142,22 @@ for example, if `source.equals = (a, b) => a === b;` and `source.value = 3;`, th
 
 `$s{x(y)}` is a shorthand for `<span bind="${x(y)}"> </span>`.
 
+### element binding
+
+```html
+<button bind-elem="elems.playButton" onclick="${playAudio()}"> </div>
+<audio src="howToStealAWalrus.mp3" type="audio/webm" bind-elem="elems.audioBook"> </div>
+```
+
+```js
+source.elems.playButton.innerText = 'click me to begin ur audiobook!';
+source.playAudio = () => {
+    source.elems.audioBook.play();
+};
+```
+
+sets a field on source to the html element.
+
 ## avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
 
 Imagine you have the following in your template `$s{func(obj)}`, and the following controller, 
