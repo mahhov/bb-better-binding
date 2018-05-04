@@ -1,4 +1,4 @@
-# be-better-binding
+# bb-better-binding
 
 1 way binding from js controllers to html templates
 
