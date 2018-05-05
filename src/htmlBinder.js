@@ -52,8 +52,11 @@ class HtmlBinder {
                 }
             }
 
-            if (bindElem)
+            if (bindElem) {
                 setProperty(this.source, [bindElem], elem);
+                this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
+                this.source.__bindIgnore__.push(bindElem);
+            }
 
             if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);

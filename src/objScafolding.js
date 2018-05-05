@@ -1,9 +1,7 @@
 let getProperty = (obj, paths) => {
     let fields = getFields(paths);
     let lastField = fields.pop();
-    fields.forEach(field => {
-        obj = obj[field] || {};
-    });
+    fields.forEach(field => obj = obj[field] || {});
     return [obj, lastField];
 };
 
