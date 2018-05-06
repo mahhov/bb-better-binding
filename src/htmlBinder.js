@@ -101,7 +101,7 @@ class HtmlBinder {
                 elem.replaceWith(container);
                 elem.removeAttribute('bind-for');
                 this.createBind(bindName);
-                this.binds[bindName].fors.push({container, elem, sourceTo, sourceFrom: bindName, sourceLinks});
+                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
                 this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
 
             } else if (bindIf) {
