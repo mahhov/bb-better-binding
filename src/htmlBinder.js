@@ -1,5 +1,5 @@
 const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined} = require('./objScafolding');
-const {splitByWord, splitBySpace} = require('./stringSplitter');
+const {splitByWord, splitByComma, splitBySpace} = require('./stringSplitter');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
 const fileReader = require('./fileReader');
@@ -82,15 +82,15 @@ class HtmlBinder {
                 elem.appendChild(componentElem);
                 sourceLinks = clone(sourceLinks);
                 params.forEach((to, index) => {
-                    sourceLinks[to] = paramsInput[index];
+                    sourceLinks[to] = translate(paramsInput[index], sourceLinks);
                 });
 
             } else if (bindAs) {
                 sourceLinks = clone(sourceLinks);
-                splitByWord(bindAs, ',')
+                splitByComma(bindAs)
                     .map(as => splitByWord(as, 'as'))
                     .forEach(([from, to]) => {
-                        sourceLinks[to] = from;
+                        sourceLinks[to] = translate(from, sourceLinks);
                     });
 
             } else if (bindFor) {
@@ -251,6 +251,7 @@ class HtmlBinder {
                 container.removeChild(container.lastElementChild);
             for (let index = container.childElementCount; index < value.length; index++) {
                 let childElem = document.importNode(outerElem, true);
+                let sourceFrom = translate(sourceFrom, sourceLinks);
                 sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
