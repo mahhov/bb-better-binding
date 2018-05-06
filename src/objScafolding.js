@@ -33,13 +33,13 @@ let modify = (original, key, value) => {
 };
 
 let translate = (name, links) => {
-    let occured = [];
+    let occurred = [];
     let fields = getFields([name]);
     while (fields[0] in links) {
-        occured.push(fields[0]);
+        occurred.push(fields[0]);
         fields[0] = links[fields[0]];
-        if (occured.includes(fields[0]))
-            return fields;
+        if (occurred.includes(fields[0]))
+            break;
         fields = getFields(fields);
     }
     return fields.reduce((a, b) => `${a}.${b}`);
