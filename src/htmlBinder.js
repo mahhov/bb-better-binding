@@ -58,7 +58,18 @@ class HtmlBinder {
                 this.source.__bindIgnore__.push(bindElem);
             }
 
-            if (bindComponentLink) {
+            if (bindFor) {
+                skip = true;
+                let [sourceTo, bindName] = splitByWord(bindFor, 'in');
+                bindName = translate(bindName, sourceLinks);
+                let container = document.createElement('for-parent');
+                elem.replaceWith(container);
+                elem.removeAttribute('bind-for');
+                this.createBind(bindName);
+                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
+                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
+
+            } else if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
                 let loadedHtml = document.createElement('div');
                 loadedHtml.innerHTML = read;
@@ -92,17 +103,6 @@ class HtmlBinder {
                     .forEach(([from, to]) => {
                         sourceLinks[to] = translate(from, sourceLinks);
                     });
-
-            } else if (bindFor) {
-                skip = true;
-                let [sourceTo, bindName] = splitByWord(bindFor, 'in');
-                bindName = translate(bindName, sourceLinks);
-                let container = document.createElement('for-parent');
-                elem.replaceWith(container);
-                elem.removeAttribute('bind-for');
-                this.createBind(bindName);
-                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
-                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
 
             } else if (bindIf) {
                 let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
