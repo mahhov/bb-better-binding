@@ -72,15 +72,13 @@ class HtmlBinder {
                 let params = splitBySpace(paramsGroup);
                 elem.remove();
                 elem.removeAttribute('bind-component');
-                let outerHtml = elem.outerHTML;
-                this.components[componentName] = {outerHtml, params};
+                this.components[componentName] = {outerElem: elem, params};
 
             } else if (bindUse) {
                 let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
                 let paramsInput = splitBySpace(paramsGroup);
-                let {outerHtml, params} = this.components[componentName];
-                let componentElem = document.createElement('div');
-                componentElem.innerHTML = outerHtml;
+                let {outerElem, params} = this.components[componentName];
+                let componentElem = document.importNode(outerElem, true);
                 elem.appendChild(componentElem);
                 sourceLinks = clone(sourceLinks);
                 params.forEach((to, index) => {
@@ -99,13 +97,12 @@ class HtmlBinder {
                 skip = true;
                 let [sourceTo, bindName] = splitByWord(bindFor, 'in');
                 bindName = translate(bindName, sourceLinks);
-                let container = document.createElement('div');
+                let container = document.createElement('for-parent');
                 elem.replaceWith(container);
                 elem.removeAttribute('bind-for');
-                let outerHtml = elem.outerHTML;
                 this.createBind(bindName);
-                this.binds[bindName].fors.push({container, outerHtml, sourceTo, sourceFrom: bindName, sourceLinks});
-                this.applyBindFor(container, outerHtml, sourceTo, bindName, linkBaseDir);
+                this.binds[bindName].fors.push({container, elem, sourceTo, sourceFrom: bindName, sourceLinks});
+                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
 
             } else if (bindIf) {
                 let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
@@ -139,8 +136,8 @@ class HtmlBinder {
                 functionName ? this.applyBindFunctionAttribute(elem, attributeName, functionName, params) : this.applyBindAttribute(elem, attributeName, params);
             });
 
-            bind.fors.forEach(({container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
-                this.applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
+            bind.fors.forEach(({container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
+                this.applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
             });
 
             bind.ifs.forEach(({elem, expressionName, params, bindName}) => {
@@ -247,14 +244,13 @@ class HtmlBinder {
         };
     }
 
-    applyBindFor(container, outerHtml, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
+    applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
         let value = getValue(this.source, [sourceFrom]);
         if (value && Array.isArray(value)) {
             while (container.childElementCount > value.length)
                 container.removeChild(container.lastElementChild);
             for (let index = container.childElementCount; index < value.length; index++) {
-                let childElem = document.createElement('div');
-                childElem.innerHTML = outerHtml;
+                let childElem = document.importNode(outerElem, true);
                 sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
@@ -314,7 +310,7 @@ class HtmlBinder {
 
 // binds = {
 //     'a.b.c': {
-//         fors: [{container, outerHtml, sourceTo, sourceFrom, sourceLinks}],
+//         fors: [{container, outerElem, sourceTo, sourceFrom, sourceLinks}],
 //         ifs: [expressionBind1, expressionBind3],
 //         values: [expressionBind1, expressionBind2],
 //         attributes: [attributeBind1, attributeBind2]
@@ -342,7 +338,7 @@ class HtmlBinder {
 //
 // components = {
 //     a: {
-//         outerHtml: outerHtml,
+//         outerElem: outerElem,
 //         params: []
 //     }
 // };
