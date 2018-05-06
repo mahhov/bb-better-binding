@@ -251,7 +251,6 @@ class HtmlBinder {
                 container.removeChild(container.lastElementChild);
             for (let index = container.childElementCount; index < value.length; index++) {
                 let childElem = document.importNode(outerElem, true);
-                let sourceFrom = translate(sourceFrom, sourceLinks);
                 sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
