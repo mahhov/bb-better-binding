@@ -1,6 +1,7 @@
 let createSource = () => {
     let handlers = {};
     let source = createProxy({}, handlers);
+    setSourceNumbers(source);
     return {source, handlers};
 };
 
@@ -38,5 +39,12 @@ let propogateHandlerDown = handlers => {
 };
 
 let doHandler = handler => typeof handler._func_ === 'function' && handler._func_();
+
+let setSourceNumbers = source => {
+    source._numbers_ = new Proxy({}, {
+        get: (_, prop) => parseInt(prop),
+        set: () => false
+    });
+};
 
 module.exports = {createSource};

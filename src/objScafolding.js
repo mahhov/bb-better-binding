@@ -26,7 +26,7 @@ let clone = original => {
     return Object.assign({}, original);
 };
 
-let modify = (original, key, value) => {
+let modify = (original, key, value) => { // todo remove unneccessary helper function
     let modified = Object.assign({}, original);
     modified[key] = value;
     return modified

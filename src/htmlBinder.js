@@ -252,6 +252,7 @@ class HtmlBinder {
             for (let index = container.childElementCount; index < value.length; index++) {
                 let childElem = document.importNode(outerElem, true);
                 sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
+                sourceLinks.index = `_numbers_.${index}`;
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
             }
