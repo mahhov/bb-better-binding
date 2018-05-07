@@ -26,12 +26,6 @@ let clone = original => {
     return Object.assign({}, original);
 };
 
-let modify = (original, key, value) => { // todo remove unneccessary helper function
-    let modified = Object.assign({}, original);
-    modified[key] = value;
-    return modified
-};
-
 let translate = (name, links) => {
     let occurred = [];
     let fields = getFields([name]);
@@ -55,4 +49,4 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
-module.exports = {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined};
+module.exports = {getValue, setProperty, clone, translate, indexToDot, notUndefined};

@@ -1,4 +1,4 @@
-const {getValue, setProperty, clone, modify, translate, indexToDot, notUndefined} = require('./objScafolding');
+const {getValue, setProperty, clone, translate, indexToDot, notUndefined} = require('./objScafolding');
 const {splitByWord, splitByComma, splitBySpace} = require('./stringSplitter');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
@@ -251,7 +251,8 @@ class HtmlBinder {
                 container.removeChild(container.lastElementChild);
             for (let index = container.childElementCount; index < value.length; index++) {
                 let childElem = document.importNode(outerElem, true);
-                sourceLinks = modify(sourceLinks, sourceTo, `${sourceFrom}.${index}`);
+                sourceLinks = clone(sourceLinks);
+                sourceLinks[sourceTo] = `${sourceFrom}.${index}`;
                 sourceLinks.index = `_numbers_.${index}`;
                 this.bindElem(childElem, sourceLinks, linkBaseDir);
                 container.appendChild(childElem);
