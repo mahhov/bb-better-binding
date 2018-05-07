@@ -86,7 +86,7 @@ sets the `hidden` property of the element
 
 ### bind as
 
-`<span bind-as="response.data.errorMessages[2].text as text> $s{text} </span>`
+`<span bind-as="response.data.errorMessages[2].text as text, ugly as pretty> $s{text} </span>`
 
 makes `text` available to all children elements as a shortcut to `source.response.data.errorMessages[2].text`
 
