@@ -238,8 +238,8 @@ class HtmlBinder {
 
     applyBindFunctionAttribute(elem, attributeName, functionName, params) {
         let handler = getValue(this.source, [functionName]);
-        elem[attributeName] = () => {
-            let paramValues = this.getParamValues(params, elem);
+        elem[attributeName] = event => {
+            let paramValues = this.getParamValues(params, elem, event);
             handler.apply(elem, paramValues);
         };
     }
@@ -279,12 +279,15 @@ class HtmlBinder {
         return typeof expression === 'function' && expression(...paramValues);
     }
 
-    getParamValues(params, thiss) {
+    getParamValues(params, thiss, event) {
         return params.map(param => {
             let paramPath = param.split('.');
             if (paramPath[0] === 'this') {
                 paramPath.shift();
                 return getValue(thiss, paramPath);
+            } else if (paramPath[0] === 'event') {
+                paramPath.shift();
+                return getValue(event, paramPath);
             }
 
             let sourceValue = getValue(this.source, [param]);

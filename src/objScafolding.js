@@ -7,7 +7,7 @@ let getProperty = (obj, paths) => {
 
 let getValue = (obj, paths) => {
     let property = getProperty(obj, paths);
-    return property[0][property[1]];
+    return property[1] === undefined ? property[0] : property[0][property[1]];
 };
 
 let createProperty = (obj, paths) => {
@@ -42,7 +42,7 @@ let translate = (name, links) => {
 let getFields = paths =>
     paths
         .map(path => path.split('.'))
-        .reduce((aggregate, item) => aggregate.concat(item));
+        .reduce((aggregate, item) => aggregate.concat(item), []);
 
 let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.${match}`);
 

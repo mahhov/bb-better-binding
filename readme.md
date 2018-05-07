@@ -125,7 +125,7 @@ binds `source.i` to the element name and `source.favoriteColor` and `source.larg
 
 ### function binding
 
-`<input onclick="${logHello(userName, '!!!')}" onchange="${logWoah()}"> </input>`
+`<input onclick="${logHello(userName, '!!!')}" onchange="${logWoah(this, event)}"> </input>`
 
 binds `source.userName` and `source.logHello` to the element's `onclick` attribute. If either changes, the `onclick` attribute will be reassigned to `source.logHello(source.userName, '!!!')`.
 
