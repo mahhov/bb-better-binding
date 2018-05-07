@@ -74,9 +74,9 @@ replaces the innerHtml of the element with `source.x`
 
 ### bind for
 
-`<span bind-for="item in list"> $s{item} </span>`
+`<span bind-for="item in list"> # $s{index} : $s{item} </span>`
 
-repeats the element for each element in `source.list` and makes `item` available to all children elements
+repeats the element for each element in `source.list` and makes `item` and `index` available to all children elements
 
 ### bind if
 
