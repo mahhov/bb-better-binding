@@ -58,18 +58,7 @@ class HtmlBinder {
                 this.source.__bindIgnore__.push(bindElem);
             }
 
-            if (bindFor) {
-                skip = true;
-                let [sourceTo, bindName] = splitByWord(bindFor, 'in');
-                bindName = translate(bindName, sourceLinks);
-                let container = document.createElement('for-parent');
-                elem.replaceWith(container);
-                elem.removeAttribute('bind-for');
-                this.createBind(bindName);
-                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
-                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
-
-            } else if (bindComponentLink) {
+            if (bindComponentLink) {
                 let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
                 let loadedHtml = document.createElement('div');
                 loadedHtml.innerHTML = read;
@@ -85,32 +74,50 @@ class HtmlBinder {
                 elem.removeAttribute('bind-component');
                 this.components[componentName] = {outerElem: elem, params};
 
-            } else if (bindUse) {
-                let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
-                let paramsInput = splitBySpace(paramsGroup);
-                let {outerElem, params} = this.components[componentName];
-                let componentElem = document.importNode(outerElem, true);
-                elem.appendChild(componentElem);
-                sourceLinks = clone(sourceLinks);
-                params.forEach((to, index) => {
-                    sourceLinks[to] = translate(paramsInput[index], sourceLinks);
-                });
+            } else if (bindFor) {
+                skip = true;
+                let [sourceTo, bindName] = splitByWord(bindFor, 'in');
+                bindName = translate(bindName, sourceLinks);
+                let container = document.createElement('for-parent');
+                elem.replaceWith(container);
+                elem.removeAttribute('bind-for');
+                this.createBind(bindName);
+                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
+                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
 
-            } else if (bindAs) {
-                sourceLinks = clone(sourceLinks);
-                splitByComma(bindAs)
-                    .map(as => splitByWord(as, 'as'))
-                    .forEach(([from, to]) => {
-                        sourceLinks[to] = translate(from, sourceLinks);
+            } else {
+                if (bindUse) {
+                    let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
+                    let paramsInput = splitBySpace(paramsGroup);
+                    let {outerElem, params} = this.components[componentName];
+                    let componentElem = document.importNode(outerElem, true);
+                    elem.appendChild(componentElem);
+                    sourceLinks = clone(sourceLinks);
+                    params.forEach((to, index) => {
+                        sourceLinks[to] = translate(paramsInput[index], sourceLinks);
                     });
+                }
 
-            } else if (bindIf) {
-                let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
-                this.applyBindIf(elem, expressionName, params, bindName);
+                if (bindAs) {
+                    sourceLinks = clone(sourceLinks);
+                    splitByComma(bindAs)
+                        .map(as => splitByWord(as, 'as'))
+                        .forEach(([from, to]) => {
+                            sourceLinks[to] = translate(from, sourceLinks);
+                        });
 
-            } else if (bindValue) {
-                let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindValue, 'values', sourceLinks);
-                this.applyBindValue(elem, expressionName, params, bindName);
+                }
+
+                if (bindIf) {
+                    let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
+                    this.applyBindIf(elem, expressionName, params, bindName);
+
+                }
+
+                if (bindValue) {
+                    let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindValue, 'values', sourceLinks);
+                    this.applyBindValue(elem, expressionName, params, bindName);
+                }
             }
         }
 
