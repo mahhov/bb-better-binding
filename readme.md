@@ -158,6 +158,62 @@ source.playAudio = () => {
 
 sets a field on source to the html element.
 
+## utility expressions available by default for `bind-if` and `bind`
+
+`!`, `not`
+```html
+<div>visibile: $s{not(x)}</div>
+<div bind-if="${!(x)}"> visible if x is falsy </div>
+```
+
+`=`, `eq`, `equal`
+```html
+<div>visibile: $s{eq(x, y)}</div>
+<div bind-if="${=(x, y)}"> </div>
+```
+
+`!=`, `nEq`, `notEqual`
+```html
+<div>visibile: $s{nEq(x, y)}</div>
+<div bind-if="${!=(x, y)}"> visible if x !== y </div>
+```
+
+`>`, `greater`
+```html
+<div>visibile: $s{greater(x, y)}</div>
+<div bind-if="${>(x, y)}"> visible if x > y </div>
+```
+
+`<`, `less`
+```html
+<div>visibile: $s{less(x, y)}</div>
+<div bind-if="${<(x, y)}"> visible if x < y </div>
+```
+
+`>=`, `greaterEq`
+```html
+<div>visibile: $s{greaterEq(x, y)}</div>
+<div bind-if="${>=(x, y)}"> visibile if x >= y </div>
+```
+
+`<=`, `lessEq`
+```html
+<div>visibile: $s{greaterEq(x, y)}</div>
+<div bind-if="${<=(x, y)}"> visible if x <= y </div>
+```
+
+`|`, `||`, `or`
+```html
+<div>visibile: $s{or(x, y, z, w)}</div>
+<div bind-if="${|(x, y, z, w)}"> visible if any argument is truthy </div>
+```
+
+`&`, `&&`, `and`
+```html
+<div>visibile: $s{and(x, y, z, w)}</div>
+<div bind-if="${&(x, y, z, w)}"> visible if all arguments are truthy </div>
+```
+
 ## avoiding infinite triggers (e.g. `Maximum call stack size exceeded`)
 
 Imagine you have the following in your template `$s{func(obj)}`, and the following controller, 

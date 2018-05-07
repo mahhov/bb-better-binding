@@ -1,7 +1,7 @@
 let createSource = () => {
     let handlers = {};
     let source = createProxy({}, handlers);
-    setSourceNumbers(source);
+    setDefaultSource(source);
     return {source, handlers};
 };
 
@@ -40,11 +40,33 @@ let propogateHandlerDown = handlers => {
 
 let doHandler = handler => typeof handler._func_ === 'function' && handler._func_();
 
-let setSourceNumbers = source => {
+let setDefaultSource = source => {
     source._numbers_ = new Proxy({}, {
         get: (_, prop) => parseInt(prop),
         set: () => false
     });
+    source.not = a => !a;
+    source['!'] = a => !a;
+    source.eq = (a, b) => a === b;
+    source.equal = (a, b) => a === b;
+    source['='] = (a, b) => a === b;
+    source.nEq = (a, b) => a !== b;
+    source.notEqual = (a, b) => a !== b;
+    source['!='] = (a, b) => a !== b;
+    source.greater = (a, b) => a > b;
+    source['>'] = (a, b) => a > b;
+    source.less = (a, b) => a < b;
+    source['<'] = (a, b) => a < b;
+    source.greaterEq = (a, b) => a >= b;
+    source['>='] = (a, b) => a >= b;
+    source.lessEq = (a, b) => a <= b;
+    source['<='] = (a, b) => a <= b;
+    source.or = (...as) => as.some(a => a);
+    source['|'] = (...as) => as.some(a => a);
+    source['||'] = (...as) => as.some(a => a);
+    source.and = (...as) => as.every(a => a);
+    source['&'] = (...as) => as.every(a => a);
+    source['&&'] = (...as) => as.every(a => a);
 };
 
 module.exports = {createSource};
