@@ -105,13 +105,11 @@ class HtmlBinder {
                         .forEach(([from, to]) => {
                             sourceLinks[to] = translate(from, sourceLinks);
                         });
-
                 }
 
                 if (bindIf) {
                     let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
                     this.applyBindIf(elem, expressionName, params, bindName);
-
                 }
 
                 if (bindValue) {
