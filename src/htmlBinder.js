@@ -27,15 +27,6 @@ class HtmlBinder {
         let skip = false;
 
         if (elem.getAttribute) {
-            let bindElem = HtmlBinder.getBindAttribute(elem, 'bind-elem');
-            let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
-            let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
-            let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
-            let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
-            let bindFor = HtmlBinder.getBindAttribute(elem, 'bind-for');
-            let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
-            let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
-
             let attributes = elem.attributes;
             for (let i = 0; i < attributes.length; i++) {
                 let {name: attributeName, value} = attributes[i];
@@ -51,6 +42,15 @@ class HtmlBinder {
                     this.applyBindFunctionAttribute(elem, attributeName, functionName, params);
                 }
             }
+
+            let bindElem = HtmlBinder.getBindAttribute(elem, 'bind-elem');
+            let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
+            let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
+            let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
+            let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
+            let bindFor = HtmlBinder.getBindAttribute(elem, 'bind-for');
+            let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
+            let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindElem) {
                 setProperty(this.source, [bindElem], elem);
