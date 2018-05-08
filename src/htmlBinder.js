@@ -9,14 +9,14 @@ class HtmlBinder {
 
     constructor(dir, root) {
         this.binds = {};
-        let {source, handlers} = createSource();
+        let {origin, source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
         this.components = {};
         this.root = root.children[0];
         HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
-        return {source, binds: this.binds, handlers};
+        return {origin, source, binds: this.binds, handlers, components};
     }
 
     bindElem(elem, sourceLinks, linkBaseDir) {
@@ -365,11 +365,8 @@ class HtmlBinder {
 // };
 
 module.exports = (dir, document, debug) => {
-    let {source, binds, handlers} = new HtmlBinder(dir, document);
-    if (debug) {
-        debug.source = source;
-        debug.binds = binds;
-        debug.handlers = handlers;
-    }
-    return source;
+    let artifacts = new HtmlBinder(dir, document);
+    if (debug)
+        Object.assign(debug, artifacts);
+    return artifacts.source;
 };

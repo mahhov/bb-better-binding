@@ -369,4 +369,79 @@ A third optional argument may be passed in order to put the source, binds, and h
 
 `const source = require('bb-better-binding')(__dirname, document, window);`
 
-Which results in creating the fields `window.source`, `window.binds`, and `window.handlers` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds` and `handlers` should not be modified unless you understand the source code.
+Which results in creating the fields `window.source`, `window.binds`, `window.handlers`, `window.components`, and `window.origin` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds`, `handlers`, `components`, and `origin` should not be modified unless you understand the source code.
+
+### binds
+
+`binds` describes which `handlers` should be invoked when which `source` values are changed.
+
+```js
+binds = {
+    'a.b.c': {
+        fors: [{container, outerElem, sourceTo, sourceFrom, sourceLinks}],
+        ifs: [expressionBind1, expressionBind3],
+        values: [expressionBind1, expressionBind2],
+        attributes: [attributeBind1, attributeBind2]
+    }
+};
+
+attributeBind = {
+    elem: elem1,
+    attributeName,
+    functionName, // can be null
+    params: [{stringValue | sourceValue: string}], // for null functionName
+    params: [] // for not null functionName
+};
+
+
+expressionBind = {
+    elem: elem1,
+    expressionName, // can be null
+    params: [],
+    bindName // can be null
+};
+```
+
+### handlers
+
+`handlers` is the functions tree that is navigated and invoked appropriately when `bindings` are invoked because `source` values changed
+
+```js
+handlers = {
+    a: {
+        _func_: 'func',
+        b: {
+            c: {
+                _func_: 'func'
+            }
+        }
+    }
+};
+```
+
+### components
+
+`components` contains all defined components
+
+```js
+components = {
+    a: {
+        outerElem: outerElem,
+        params: []
+    }
+};
+```
+
+### origin
+
+`origin` provides a convenient way to view the contents of `source` without a distracting `proxy` wrapper 
+
+```js
+origin = {
+    a: {
+        b: {
+            c: {}
+        }
+    }
+};
+```

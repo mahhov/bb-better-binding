@@ -1,8 +1,9 @@
 let createSource = () => {
     let handlers = {};
-    let source = createProxy({}, handlers);
-    setDefaultSource(source);
-    return {source, handlers};
+    let origin = {};
+    let source = createProxy(origin, handlers);
+    setDefaultSource(origin);
+    return {origin, source, handlers};
 };
 
 let ignore = [];
