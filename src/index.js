@@ -1,6 +1,4 @@
-const htmlBinder = require('./htmlBinder');
-
-module.exports = (dir, root) => htmlBinder(dir, root);
+module.exports = require('./htmlBinder');
 
 // todo
 // allow array binding in html: `<div bind="x[y]"></div>`

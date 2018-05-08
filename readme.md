@@ -358,3 +358,15 @@ The example above displays `hi there`. Modifying the field `flag` on object `sou
 0. as binding
 0. if binding
 0. value binding
+
+## debug mode
+
+Typically, you would initiate the parsing of html, creation of binds, and retrieval of source via:
+
+`const source = require('bb-better-binding')(__dirname, document);`
+
+A third optional argument may be passed in order to put the source, binds, and handlers onto an easily-viewable-during-runtime location such as `window`.
+
+`const source = require('bb-better-binding')(__dirname, document, window);`
+
+Which results in creating the fields `window.source`, `window.binds`, and `window.handlers` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds` and `handlers` should not be modified unless you understand the source code.

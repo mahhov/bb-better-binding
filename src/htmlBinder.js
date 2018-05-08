@@ -16,11 +16,7 @@ class HtmlBinder {
         this.root = root.children[0];
         HtmlBinder.replaceInlineBindings(this.root);
         this.bindElem(root, {}, dir);
-        if (window) {
-            window.source = this.source;
-            window.binds = this.binds;
-            window.handlers = this.handlers;
-        }
+        return {source, binds: this.binds, handlers};
     }
 
     bindElem(elem, sourceLinks, linkBaseDir) {
@@ -368,4 +364,12 @@ class HtmlBinder {
 //     bindName // can be null
 // };
 
-module.exports = (dir, document) => new HtmlBinder(dir, document).source;
+module.exports = (dir, document, debug) => {
+    let {source, binds, handlers} = new HtmlBinder(dir, document);
+    if (debug) {
+        debug.source = source;
+        debug.binds = binds;
+        debug.handlers = handlers;
+    }
+    return source;
+};
