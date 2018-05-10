@@ -6,6 +6,14 @@
 
 run: `npm i -save bb-beter-binding`
 
+## Hello World
+
+[controller.js](example/helloWorld/examplePlain/controller.js)
+
+[index.html](example/helloWorld/examplePlain/index.html)
+
+[live demo]()
+
 ## Simple Example
 
 ### your `.html` template
