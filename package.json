@@ -4,7 +4,8 @@
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
-    "example": "electron example/index.js",
+    "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build/helloWorld -o -a localhost -c-1",
+    "build-example": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/helloWorld/controller.js -o build/helloWorld/controller.js",
     "postversion": "git push && git push --tags && npm publish"
   },
   "author": "mahhov",
@@ -12,5 +13,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mahhov/bb-better-binding"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2",
+    "http-server": "^0.11.1",
+    "nodemon": "^1.17.4"
   }
 }
