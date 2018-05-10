@@ -4,9 +4,9 @@
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
-    "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build/helloWorld -o -a localhost -c-1",
-    "build-example": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/helloWorld/controller.js -o build/helloWorld/controller.js",
-    "build-docs": "[ -d docs ] && rm -r docs; cp -r example/helloWorld docs; browserify --debug example/helloWorld/controller.js -o docs/controller.js",
+    "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build & http-server ./build -o -a localhost -c-1",
+    "build": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/controller.js -o build/controller.js",
+    "build-docs": "[ -d docs ] && rm -r docs; npm run build && cp -r build docs",
     "postversion": "npm run build-docs && git push && git push --tags && npm publish"
   },
   "author": "mahhov",

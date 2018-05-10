@@ -8,9 +8,9 @@ run: `npm i -save bb-beter-binding`
 
 ## Hello World
 
-[controller.js](example/helloWorld/controller.js)
+[controller.js](example/controller.js)
 
-[index.html](example/helloWorld/index.html)
+[index.html](example/index.html)
 
 [live demo](https://mahhov.github.io/bb-better-binding/)
 
