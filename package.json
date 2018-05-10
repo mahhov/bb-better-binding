@@ -6,7 +6,8 @@
   "scripts": {
     "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build/helloWorld -o -a localhost -c-1",
     "build-example": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/helloWorld/controller.js -o build/helloWorld/controller.js",
-    "postversion": "git push && git push --tags && npm publish"
+    "build-docs": "[ -d docs ] && rm -r docs; cp -r example/helloWorld docs; browserify --debug example/helloWorld/controller.js -o docs/controller.js",
+    "postversion": "npm run build-docs && git push && git push --tags && npm publish"
   },
   "author": "mahhov",
   "license": "ISC",

@@ -12,7 +12,7 @@ run: `npm i -save bb-beter-binding`
 
 [index.html](example/helloWorld/index.html)
 
-[live demo]()
+[live demo](https://mahhov.github.io/bb-better-binding/)
 
 ## Simple Example
 
