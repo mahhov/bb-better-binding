@@ -7,7 +7,7 @@
     "dev": "nodemon --watch example --watch src -e html,js --exec npm run build & http-server ./build -o -a localhost -c-1",
     "build": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/controller.js -o build/controller.js; cp favicon.ico build",
     "build-docs": "[ -d docs ] && rm -r docs; npm run build && cp -r build docs",
-    "postversion": "npm run build-docs && git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish"
   },
   "author": "mahhov",
   "license": "ISC",
