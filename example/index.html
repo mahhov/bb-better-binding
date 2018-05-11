@@ -13,12 +13,15 @@
 </div>
 
 <div style="margin-top:100px">
-    but i have jokes:
-    <div bind-for="joke in jokes">
-        <h3 bind="index"></h3>
-        <p bind-for="line in joke.lines" bind="line"></p>
+    <p>i have jokes:</p>
+    <input id="check" type="checkbox" onchange="${setJokeVisibility(this)}"/><label for="check">show jokes?</label>
+    <div bind-if="jokeVisibility">
+        <div bind-for="joke in jokes">
+            <h3 bind="index"></h3>
+            <p bind-for="line in joke.lines" bind="line"></p>
+        </div>
+        <h3>Source: $s{jokesSource}</h3>
     </div>
-    <h3>Source: $s{jokesSource}</h3>
 </div>
 
 <script src="controller.js"></script>

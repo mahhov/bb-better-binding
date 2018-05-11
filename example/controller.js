@@ -23,6 +23,9 @@ source.changeAnimation = () => {
 source.changeAnimation();
 
 // jokes
+source.setJokeVisibility = checkbox => {
+    source.jokeVisibility = checkbox.checked;
+};
 source.jokes = [
     {
         lines: [
