@@ -1,4 +1,14 @@
-module.exports = require('./htmlBinder');
+const htmlBinder = require('./htmlBinder');
+// const fileReader = require('./fileReader');
+
+let readComponent = (dir, htmlFileName, jsFileName, debug) => {
+    // return htmlBinder(dir, )  
+};
+
+const fs = require('fs');
+console.log(fs.readFile);
+
+module.exports = htmlBinder;
 
 // todo
 // allow array binding in html: `<div bind="x[y]"></div>`

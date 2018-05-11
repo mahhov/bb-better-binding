@@ -4,9 +4,11 @@
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon --watch example --watch src -e html,js --exec npm run build & http-server ./build -o -a localhost -c-1",
-    "build": "[ -d build ] && rm -r build; cp -r example build; browserify --debug example/controller.js -o build/controller.js; cp favicon.ico build",
-    "build-docs": "[ -d docs ] && rm -r docs; npm run build && cp -r build docs",
+    "dev-live": "nodemon --watch liveExample --watch src -e html,js --exec npm run build-live-example & http-server ./build -o -a localhost -c-1",
+    "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build -o -a localhost -c-1",
+    "build-example": "[ -d build ] && rm -r build; cp -r example build; browserify -t brfs --debug example/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-live-example": "[ -d build ] && rm -r build; cp -r liveExample build; browserify -t brfs --debug liveExample/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-docs": "[ -d docs ] && rm -r docs; npm run build-example && cp -r build docs",
     "postversion": "git push && git push --tags && npm publish"
   },
   "author": "mahhov",
@@ -16,6 +18,7 @@
     "url": "https://github.com/mahhov/bb-better-binding"
   },
   "devDependencies": {
+    "brfs": "^1.6.1",
     "browserify": "^16.2.2",
     "http-server": "^0.11.1",
     "nodemon": "^1.17.4"
