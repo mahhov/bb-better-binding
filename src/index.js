@@ -1,14 +1,23 @@
-const htmlBinder = require('./htmlBinder');
-// const fileReader = require('./fileReader');
+const HtmlBinder = require('./htmlBinder');
 
-let readComponent = (dir, htmlFileName, jsFileName, debug) => {
-    // return htmlBinder(dir, )  
-};
+class Booter {
 
-const fs = require('fs');
-console.log(fs.readFile);
+    constructor() {
+        this.blocks = {};
+    }
 
-module.exports = htmlBinder;
+    declareBlock(blockName, block) {
+        this.blocks[blockName] = block;
+    }
+
+    boot(root, debug) {
+        let artifacts = new HtmlBinder(root, this.blocks);
+        debug && Object.assign(debug, artifacts);
+        return artifacts.source;
+    }
+}
+
+module.exports = () => new Booter();
 
 // todo
 // allow array binding in html: `<div bind="x[y]"></div>`

@@ -1,10 +1,7 @@
-const source = require('bb-better-binding')(__dirname, document, window);
-const bindForExample = require('./bindFor/bindFor.js');
-const fs = require('fs');
+const bbb = require('bb-better-binding')();
 
-window.bindFor = fs.readFileSync(`${__dirname}/bindFor/bindFor.html`, 'utf8');
+bbb.declareBlock('bindFor', require('./bindFor/bindFor'));
 
-console.log(__dirname);
-fs.readdir(__dirname, (err, files) => {
-    console.log(files);
-});
+const source = bbb.boot(document.firstElementChild, window);
+
+source.name = 'jay';

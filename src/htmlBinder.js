@@ -2,24 +2,24 @@ const {getValue, setProperty, clone, translate, indexToDot, notUndefined} = requ
 const {splitByWord, splitByComma, splitBySpace} = require('./stringSplitter');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
-const fileReader = require('./fileReader');
 const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
 
 class HtmlBinder {
 
-    constructor(dir, root) {
+    constructor(root, blocks) {
         this.binds = {};
         let {origin, source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
         this.components = {};
-        this.root = root.children[0];
-        HtmlBinder.replaceInlineBindings(this.root);
-        this.bindElem(root, {}, dir);
+        this.root = root;
+        HtmlBinder.replaceInlineBindings(root);
+        this.blocks = blocks;
+        this.bindElem(root, {});
         return {origin, source, binds: this.binds, handlers, components: this.components};
     }
 
-    bindElem(elem, sourceLinks, linkBaseDir) {
+    bindElem(elem, sourceLinks) {
         let skip = false;
 
         if (elem.getAttribute) {
@@ -40,7 +40,7 @@ class HtmlBinder {
             }
 
             let bindElem = HtmlBinder.getBindAttribute(elem, 'bind-elem');
-            let bindComponentLink = HtmlBinder.getBindAttribute(elem, 'bind-component-link');
+            let bindBlock = HtmlBinder.getBindAttribute(elem, 'bind-block');
             let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
             let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
             let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
@@ -54,13 +54,14 @@ class HtmlBinder {
                 this.source.__bindIgnore__.push(bindElem);
             }
 
-            if (bindComponentLink) {
-                let {readDir, read} = fileReader(linkBaseDir, bindComponentLink);
-                let loadedHtml = document.createElement('div');
-                loadedHtml.innerHTML = read;
-                HtmlBinder.replaceInlineBindings(loadedHtml);
-                elem.replaceWith(loadedHtml);
-                this.bindElem(loadedHtml, sourceLinks, readDir);
+            if (bindBlock) {
+                skip = true;
+                let {template, controller} = this.blocks[bindBlock];
+                let container = document.createElement('block-parent');
+                container.innerHTML = template;
+                elem.replaceWith(container);
+                controller(new HtmlBinder(container, this.blocks).source);
+                // todo debugger for block bindings
 
             } else if (bindComponent) {
                 skip = true;
@@ -78,8 +79,14 @@ class HtmlBinder {
                 elem.replaceWith(container);
                 elem.removeAttribute('bind-for');
                 this.createBind(bindName);
-                this.binds[bindName].fors.push({container, outerElem: elem, sourceTo, sourceFrom: bindName, sourceLinks});
-                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks, linkBaseDir);
+                this.binds[bindName].fors.push({
+                    container,
+                    outerElem: elem,
+                    sourceTo,
+                    sourceFrom: bindName,
+                    sourceLinks
+                });
+                this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks);
 
             } else {
                 if (bindUse) {
@@ -117,7 +124,7 @@ class HtmlBinder {
 
         if (!skip)
             for (let i = elem.children.length - 1; i >= 0; i--)
-                this.bindElem(elem.children[i], sourceLinks, linkBaseDir);
+                this.bindElem(elem.children[i], sourceLinks);
     }
 
     createBind(bindName) {
@@ -137,8 +144,8 @@ class HtmlBinder {
                 functionName ? this.applyBindFunctionAttribute(elem, attributeName, functionName, params) : this.applyBindAttribute(elem, attributeName, params);
             });
 
-            bind.fors.forEach(({container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir}) => {
-                this.applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir);
+            bind.fors.forEach(({container, outerElem, sourceTo, sourceFrom, sourceLinks}) => {
+                this.applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks);
             });
 
             bind.ifs.forEach(({elem, expressionName, params, bindName}) => {
@@ -151,7 +158,7 @@ class HtmlBinder {
         });
     }
 
-    extractExpressionBind(elem, expressionStr, type, sourceLinks) { // type = 'ifs' or 'values' 
+    extractExpressionBind(elem, expressionStr, type, sourceLinks) { // type = 'ifs' or 'values'
         let expressionMatch = expressionStr.match(expressionRegex);
         if (expressionMatch) {
             let [, , expressionName, paramsStr] = expressionMatch;
@@ -221,7 +228,7 @@ class HtmlBinder {
         // todo prevent binding non source values
     }
 
-    addExpressionBind(bindName, elem, type, expressionValue) { // type = 'ifs' or 'values' 
+    addExpressionBind(bindName, elem, type, expressionValue) { // type = 'ifs' or 'values'
         this.createBind(bindName);
         let binded = this.binds[bindName][type].some(otherBind =>
             otherBind.elem === elem
@@ -245,7 +252,7 @@ class HtmlBinder {
         };
     }
 
-    applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks, linkBaseDir) {
+    applyBindFor(container, outerElem, sourceTo, sourceFrom, sourceLinks) {
         let value = getValue(this.source, [sourceFrom]);
         if (value && Array.isArray(value)) {
             while (container.childElementCount > value.length)
@@ -255,7 +262,7 @@ class HtmlBinder {
                 sourceLinks = clone(sourceLinks);
                 sourceLinks[sourceTo] = `${sourceFrom}.${index}`;
                 sourceLinks.index = `_numbers_.${index}`;
-                this.bindElem(childElem, sourceLinks, linkBaseDir);
+                this.bindElem(childElem, sourceLinks);
                 container.appendChild(childElem);
             }
         }
@@ -364,9 +371,4 @@ class HtmlBinder {
 //     bindName // can be null
 // };
 
-module.exports = (dir, document, debug) => {
-    let artifacts = new HtmlBinder(dir, document);
-    if (debug)
-        Object.assign(debug, artifacts);
-    return artifacts.source;
-};
+module.exports = HtmlBinder;
