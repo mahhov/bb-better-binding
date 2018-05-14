@@ -1,7 +1,7 @@
-const bbb = require('bb-better-binding')();
+const bb = require('bb-better-binding')();
 
-bbb.declareBlock('bindFor', require('./bindFor/bindFor'));
+bb.declareBlock('bindFor', require('./bindFor/bindFor'));
 
-const source = bbb.boot(document.firstElementChild, window);
+const source = bb.boot(document.firstElementChild, window);
 
 source.name = 'jay';

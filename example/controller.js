@@ -1,4 +1,4 @@
-const source = require('bb-better-binding')(__dirname, document, window);
+const source = require('bb-better-binding')().boot(document.firstElementChild, window);
 
 // greeting
 source.largeFont = 60;
