@@ -108,10 +108,6 @@ class HtmlBinder {
                 if (bindBlock) {
                     skip = true;
                     let {template, controller} = this.blocks[bindBlock];
-                    // let container = document.createElement('block-parent');
-                    // container.innerHTML = template;
-                    // elem.replaceWith(container);
-                    // controller(new HtmlBinder(container, this.blocks).source);
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
                     controller(new HtmlBinder(elem, this.blocks).source);
