@@ -1,7 +1,6 @@
 const bb = require('bb-better-binding')();
 
+bb.declareBlock('helloWorld', require('./helloWorld/helloWorld'));
 bb.declareBlock('bindFor', require('./bindFor/bindFor'));
 
-const source = bb.boot(document.firstElementChild, window);
-
-source.name = 'jay';
+bb.boot(document.firstElementChild, window);

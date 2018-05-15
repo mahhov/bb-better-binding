@@ -52,16 +52,6 @@ class HtmlBinder {
                 setProperty(this.source, [bindElem], elem);
                 this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
                 this.source.__bindIgnore__.push(bindElem);
-            }
-
-            if (bindBlock) {
-                skip = true;
-                let {template, controller} = this.blocks[bindBlock];
-                let container = document.createElement('block-parent');
-                container.innerHTML = template;
-                elem.replaceWith(container);
-                controller(new HtmlBinder(container, this.blocks).source);
-                // todo debugger for block bindings
 
             } else if (bindComponent) {
                 skip = true;
@@ -89,18 +79,6 @@ class HtmlBinder {
                 this.applyBindFor(container, elem, sourceTo, bindName, sourceLinks);
 
             } else {
-                if (bindUse) {
-                    let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
-                    let paramsInput = splitBySpace(paramsGroup);
-                    let {outerElem, params} = this.components[componentName];
-                    let componentElem = document.importNode(outerElem, true);
-                    elem.appendChild(componentElem);
-                    sourceLinks = clone(sourceLinks);
-                    params.forEach((to, index) => {
-                        sourceLinks[to] = translate(paramsInput[index], sourceLinks);
-                    });
-                }
-
                 if (bindAs) {
                     sourceLinks = clone(sourceLinks);
                     splitByComma(bindAs)
@@ -113,6 +91,31 @@ class HtmlBinder {
                 if (bindIf) {
                     let {expressionName, params, bindName} = this.extractExpressionBind(elem, bindIf, 'ifs', sourceLinks);
                     this.applyBindIf(elem, expressionName, params, bindName);
+                }
+
+                if (bindUse) {
+                    let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
+                    let paramsInput = splitBySpace(paramsGroup);
+                    let {outerElem, params} = this.components[componentName];
+                    let componentElem = document.importNode(outerElem, true);
+                    elem.appendChild(componentElem);
+                    sourceLinks = clone(sourceLinks);
+                    params.forEach((to, index) => {
+                        sourceLinks[to] = translate(paramsInput[index], sourceLinks);
+                    });
+                }
+
+                if (bindBlock) {
+                    skip = true;
+                    let {template, controller} = this.blocks[bindBlock];
+                    // let container = document.createElement('block-parent');
+                    // container.innerHTML = template;
+                    // elem.replaceWith(container);
+                    // controller(new HtmlBinder(container, this.blocks).source);
+                    elem.removeAttribute('bind-block');
+                    elem.innerHTML = template;
+                    controller(new HtmlBinder(elem, this.blocks).source);
+                    // todo debugger for block bindings
                 }
 
                 if (bindValue) {

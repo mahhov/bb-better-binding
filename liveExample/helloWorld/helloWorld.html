@@ -1,0 +1,25 @@
+<div>
+    <div style="font-size:${largeFont}; color:${favoriteColor}">
+        $s{greeting}, $s{name} $s{exclamation}
+    </div>
+    wuts ur favorite color?
+    <input value="${favoriteColor}" onkeyup="${changeColor(this)}">
+</div>
+
+<div style="margin-top:100px">
+    <button onclick="${changeAnimation()}">click me!</button>
+    <br/>
+    <img src="${animation}">
+</div>
+
+<div style="margin-top:100px">
+    <p>i have jokes:</p>
+    <input id="check" type="checkbox" onchange="${setJokeVisibility(this)}"/><label for="check">show jokes?</label>
+    <div bind-if="jokeVisibility">
+        <div bind-for="joke in jokes">
+            <h3 bind="index"></h3>
+            <p bind-for="line in joke.lines" bind="line"></p>
+        </div>
+        <h3>Source: $s{jokesSource}</h3>
+    </div>
+</div>

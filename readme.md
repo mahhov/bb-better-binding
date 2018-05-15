@@ -391,12 +391,12 @@ The example above displays `hi there`. Modifying the field `flag` on object `sou
 
 0. attribute binding
 0. elem binding
-0. block binding
-0. component binding
 0. for binding
 0. use binding
 0. as binding
 0. if binding
+0. component binding
+0. block binding
 0. value binding
 
 ## debug mode
