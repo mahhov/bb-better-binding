@@ -31,7 +31,7 @@ run: `npm i -save bb-beter-binding`
 ### your `.js` controller
 
 ```js
-const source = require('bb-better-binding')(__dirname, document);
+const source = require('bb-better-binding')().boot(document.firstElementChild);
 
 source.showNumbers = true;
 source.numbers = [10, 12, 16, 13];
@@ -59,7 +59,7 @@ source.changeHandler = () => {
 ### your `.js` controller
 
 ```js
-const source = require('bb-better-binding')(__dirname, document);
+const source = require('bb-better-binding')().boot(document.firstElementChild);
 
 source.overdueBooks = [{
     dueDate: '15-17-32025-02',
