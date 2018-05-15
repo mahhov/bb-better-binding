@@ -115,15 +115,47 @@ defines a reusable component named `banner` and with paramters `text` and `heade
 
 uses a component named `banner`, passing `source.bannerData.text` and `source.bannerData.header` as parameters
 
-### bind component link
-
-`<link bind-component-link="./component-definitions.html"> </link>`
-
-injects the contents of the relative path `./component-definitions.html`
-
 #### Note on component load order
 
 Components are loaded from bottom of the document, upwards. This means, if `component-parent` uses `component-child`, then `component-child` should be loaded first (e.g. defined lower in the html). Similary, all usages of `component-parent` should occur after (e.g. higher in the html) the component than where it is defined. 
+
+### bind block
+
+```html
+<!-- parent template -->
+<div bind-block="todoList"> </div>
+```
+
+```js
+// parent controller
+const bb = require('bb-better-binding')();
+bb.declareBlock('todoList', require('./todoListBlock/todoList'));
+```
+
+```html
+<!-- todoList.html template -->
+hi there $s{name}
+<div bind-for="item in list" bind="item"></div>
+```
+
+```js
+// todoList.js controller
+
+let template = require('fs').readFileSync(`${__dirname}/todoList.html`, 'utf8');
+
+let controller = source => {
+    source.name = 'james';
+    source.list = ['elephant', 'lion', 'rabbit'];
+};
+
+module.exports = {template, controller};
+```
+
+Creates externalized and reusable blocks
+
+#### Blocks or Components?
+
+`Components` allow you to resuse parts of your template but remain in the same template file and share the same `source`. `Blocks` go a step further, extracting the reusable part to external files to allow use by multiple pages or blocks, have their own isolated `source`, and help keep your templates and controllers smaller. 
 
 ### attribute binding
 
@@ -358,8 +390,7 @@ The example above displays `hi there`. Modifying the field `flag` on object `sou
 
 0. attribute binding
 0. elem binding
-0. componentLink binding
-0. componentLink binding
+0. block binding
 0. component binding
 0. for binding
 0. use binding
