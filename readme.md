@@ -130,6 +130,7 @@ Components are loaded from bottom of the document, upwards. This means, if `comp
 // parent controller
 const bb = require('bb-better-binding')();
 bb.declareBlock('todoList', require('./todoListBlock/todoList'));
+bb.boot(document.firstElementChild);
 ```
 
 ```html
