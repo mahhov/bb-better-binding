@@ -403,11 +403,20 @@ The example above displays `hi there`. Modifying the field `flag` on object `sou
 
 Typically, you would initiate the parsing of html, creation of binds, and retrieval of source via:
 
-`const source = require('bb-better-binding')(__dirname, document);`
+`const source = require('bb-better-binding')().boot(document.firstElementChild);`
 
-A third optional argument may be passed in order to put the source, binds, and handlers onto an easily-viewable-during-runtime location such as `window`.
+or for apps using blocks:
 
-`const source = require('bb-better-binding')(__dirname, document, window);`
+```js
+const bb = require('bb-better-binding')();
+bb.declareBlock('blockName', require('./blockPath/blockFile'));
+// more block declarations ...
+bb.boot(document.firstElementChild);
+```
+
+A second optional argument may be passed to the `boot` method in order to put the source, binds, and handlers onto an easily-viewable-during-runtime location such as `window`.
+
+`const source = require('bb-better-binding')().boot(document.firstElementChild, window);`
 
 Which results in creating the fields `window.source`, `window.binds`, `window.handlers`, `window.components`, and `window.origin` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds`, `handlers`, `components`, and `origin` should not be modified unless you understand the source code.
 
