@@ -2,7 +2,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 </head>
 
-<!--<div bind-block="map"></div>-->
+<div bind-block="navigation"></div>
 
 <div bind-block="helloWorld" bind-if="x"></div>
 <div bind-block="bindFor"></div>
@@ -13,6 +13,27 @@
 <!--todo params-->
 
 <pre>This site was created using bb-better-binding</pre>
+
+<style>
+    button {
+        border: none;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        background: lightskyblue;
+        color: white;
+        transition: 0.2s;
+        margin-right: 10px;
+    }
+
+    button:hover {
+        background: cornflowerblue;
+    }
+
+    button:active {
+        background: dodgerblue;
+        color: white;
+    }
+</style>
 
 <script src="controller.js"></script>
 <!--todo rename cnotroller.js-->
