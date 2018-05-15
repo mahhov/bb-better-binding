@@ -72,7 +72,7 @@ source.fontSize = '30';
 
 ## Syntax
 
-### bind value
+### value binding
 
 `<span bind="x"> </span>`
 
@@ -80,25 +80,25 @@ replaces the innerHtml of the element with `source.x`
 
 `$s{x}` is a shorthand for `<span bind="x"> </span>`
 
-### bind for
+### for binding
 
 `<span bind-for="item in list"> # $s{index} : $s{item} </span>`
 
 repeats the element for each element in `source.list` and makes `item` and `index` available to all children elements
 
-### bind if
+### if binding
 
 `<span bind-if="show"> am i visible? </span>`
 
 sets the `hidden` property of the element
 
-### bind as
+### as binding
 
 `<span bind-as="response.data.errorMessages[2].text as text, ugly as pretty> $s{text} </span>`
 
 makes `text` available to all children elements as a shortcut to `source.response.data.errorMessages[2].text`
 
-### bind component 
+### component binding 
 
 ```
 <div bind-component="banner with text header">
@@ -109,7 +109,7 @@ makes `text` available to all children elements as a shortcut to `source.respons
 
 defines a reusable component named `banner` and with paramters `text` and `header`
 
-### bind use
+### use binding
 
 `<div bind-use="banner with bannerData.text bannerData.header"> </div>` 
 
@@ -119,7 +119,7 @@ uses a component named `banner`, passing `source.bannerData.text` and `source.ba
 
 Components are loaded from bottom of the document, upwards. This means, if `component-parent` uses `component-child`, then `component-child` should be loaded first (e.g. defined lower in the html). Similary, all usages of `component-parent` should occur after (e.g. higher in the html) the component than where it is defined. 
 
-### bind block
+### block binding
 
 ```html
 <!-- parent template -->
