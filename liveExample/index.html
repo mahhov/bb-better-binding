@@ -14,21 +14,24 @@
         font-family: Arial;
     }
 
-    button {
+    input[type=radio], input[type=checkbox] {
+        display: none;
+    }
+
+    button, label {
         border: none;
-        padding-top: 3px;
-        padding-bottom: 3px;
+        padding: 3px 8px;
         background: lightskyblue;
         color: white;
         transition: 0.2s;
         margin-right: 10px;
     }
 
-    button:hover {
+    button:hover, label:hover {
         background: cornflowerblue;
     }
 
-    button:active {
+    button:active, input[type=radio]:checked + label, input[type=checkbox]:checked + label {
         background: darkcyan;
     }
 </style>
