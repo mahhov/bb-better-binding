@@ -116,7 +116,7 @@ class HtmlBinder {
                     elem.innerHTML = template;
                     let block = new HtmlBinder(elem, this.blocks);
                     controller(block.source);
-                    parameters.forEach((to, index) => {
+                    parameters && parameters.forEach((to, index) => {
                         let from = translate(paramsInput[index], sourceLinks);
                         this.addPairBind(from, block.source, to);
                         this.applyPairBind(from, block.source, to);
