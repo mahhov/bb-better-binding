@@ -1,3 +1,28 @@
-<div style="background-color: lightblue">
-    <button bind-for="page in pages" bind="page" onclick="${setPageHandler(index)}"></button>
+<div>
+    <span bind-for="page in pages">
+        <input type="radio" id="navigationRadio${index}" name="navigationRadios" onchange="${setPageHandler(index)}"/>
+        <label for="navigationRadio${index}" bind="page"></label>
+    </span>
+
+    <style>
+        input[type=radio] {
+            display: none;
+        }
+
+        label {
+            padding: 2px 8px;
+            background: lightskyblue;
+            color: white;
+            transition: 0.2s;
+            margin-right: 10px;
+        }
+
+        label:hover {
+            background: cornflowerblue;
+        }
+
+        input[type=radio]:checked + label {
+            background: darkcyan;
+        }
+    </style>
 </div>
