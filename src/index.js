@@ -11,5 +11,4 @@ module.exports = () => new Booter();
 // support $e nested inside $s
 // investigate why source.a = source.b doesn't propogate changes
 // investigate why bind-for indexVars don't propogate changes
-// investigate how to set setters on non-source object assignments
 // routing or swapping states
