@@ -286,6 +286,7 @@ class HtmlBinder {
         return typeof expression === 'function' && expression(...paramValues);
     }
 
+    // todo use ParamSplitter in order to support array and object paramters
     getParamValues(params, thiss, event) {
         return params.map(param => {
             let paramPath = param.split('.');
