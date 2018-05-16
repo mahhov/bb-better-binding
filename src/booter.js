@@ -11,7 +11,7 @@ class Booter {
     }
 
     boot(root, debug) {
-        let artifacts = new HtmlBinder(root, this.blocks);
+        let artifacts = new HtmlBinder(root, this.blocks).getArtifacts();
         debug && Object.assign(debug, artifacts);
         return artifacts.source;
     }

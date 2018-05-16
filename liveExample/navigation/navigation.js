@@ -4,7 +4,12 @@ let controller = source => {
     source.pages = ['Hello World', 'Bind For'];
 
     source.setPage = pageIndex => {
-    }
+        channels.parent.send()
+    };
+
+    window.x = source;
 };
 
-module.exports = {template, controller};
+let parameters = ['pages2'];
+
+module.exports = {template, controller, parameters};

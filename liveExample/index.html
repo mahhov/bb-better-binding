@@ -2,10 +2,12 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 </head>
 
-<div bind-block="navigation"></div>
+<div bind-block="navigation with navigationPages"></div>
 
-<div bind-block="helloWorld" bind-if="x"></div>
-<div bind-block="bindFor"></div>
+<div bind-for="p in navigationPages" bind="p"></div>
+
+<!--<div bind-block="helloWorld" bind-if="x"></div>-->
+<!--<div bind-block="bindFor"></div>-->
 
 
 <!--<div bind-block="bindFor"></div>-->

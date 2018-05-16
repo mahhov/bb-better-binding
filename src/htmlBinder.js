@@ -7,16 +7,17 @@ const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, fu
 class HtmlBinder {
 
     constructor(root, blocks) {
-        this.binds = {};
         let {origin, source, handlers} = createSource();
+        this.origin = origin;
         this.source = source;
         this.handlers = handlers;
-        this.components = {};
+        this.binds = {};
         this.root = root;
-        HtmlBinder.replaceInlineBindings(root);
+        this.components = {};
         this.blocks = blocks;
+
+        HtmlBinder.replaceInlineBindings(root);
         this.bindElem(root, {});
-        return {origin, source, binds: this.binds, handlers, components: this.components};
     }
 
     bindElem(elem, sourceLinks) {
@@ -40,12 +41,12 @@ class HtmlBinder {
             }
 
             let bindElem = HtmlBinder.getBindAttribute(elem, 'bind-elem');
-            let bindBlock = HtmlBinder.getBindAttribute(elem, 'bind-block');
             let bindComponent = HtmlBinder.getBindAttribute(elem, 'bind-component');
             let bindUse = HtmlBinder.getBindAttribute(elem, 'bind-use');
             let bindAs = HtmlBinder.getBindAttribute(elem, 'bind-as');
             let bindFor = HtmlBinder.getBindAttribute(elem, 'bind-for');
             let bindIf = HtmlBinder.getBindAttribute(elem, 'bind-if');
+            let bindBlock = HtmlBinder.getBindAttribute(elem, 'bind-block');
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindElem) {
@@ -93,6 +94,7 @@ class HtmlBinder {
                     this.applyBindIf(elem, expressionName, params, bindName);
                 }
 
+                // todo allow non-source parameters for bindUse and bindBlock
                 if (bindUse) {
                     let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
                     let paramsInput = splitBySpace(paramsGroup);
@@ -107,10 +109,18 @@ class HtmlBinder {
 
                 if (bindBlock) {
                     skip = true;
-                    let {template, controller} = this.blocks[bindBlock];
+                    let [blockName, paramsGroup] = splitByWord(bindBlock, 'with');
+                    let paramsInput = paramsGroup ? splitBySpace(paramsGroup) : [];
+                    let {template, controller, parameters} = this.blocks[blockName];
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
-                    controller(new HtmlBinder(elem, this.blocks).source);
+                    let block = new HtmlBinder(elem, this.blocks);
+                    controller(block.source);
+                    parameters.forEach((to, index) => {
+                        let from = translate(paramsInput[index], sourceLinks);
+                        this.addPairBind(from, block.source, to);
+                        this.applyPairBind(from, block.source, to);
+                    });
                     // todo debugger for block bindings
                 }
 
@@ -130,7 +140,7 @@ class HtmlBinder {
         if (this.binds[bindName])
             return;
 
-        let bind = {ifs: [], fors: [], values: [], attributes: []};
+        let bind = {attributes: [], fors: [], ifs: [], pairs: [], values: []};
         this.binds[bindName] = bind;
 
         setProperty(this.handlers, [bindName, '_func_'], () => {
@@ -149,6 +159,10 @@ class HtmlBinder {
 
             bind.ifs.forEach(({elem, expressionName, params, bindName}) => {
                 this.applyBindIf(elem, expressionName, params, bindName);
+            });
+
+            bind.pairs.forEach(({from, toObj, toKey}) => {
+                this.applyPairBind(from, toObj, toKey);
             });
 
             bind.values.forEach(({elem, expressionName, params, bindName}) => {
@@ -236,6 +250,11 @@ class HtmlBinder {
         // todo prevent binding non source values
     }
 
+    addPairBind(from, toObj, toKey) {
+        this.createBind(from);
+        this.binds[from].pairs.push({from, toObj, toKey});
+    }
+
     applyBindAttribute(elem, attributeName, params) {
         let modifiedValue = params
             .map(param => param.sourceValue ? notUndefined(getValue(this.source, [param.sourceValue]), '') : param.stringValue)
@@ -270,6 +289,10 @@ class HtmlBinder {
     applyBindIf(elem, expressionName, params, bindName) {
         let value = this.obtainExpressionValue(elem, expressionName, params, bindName);
         elem.hidden = !value;
+    }
+
+    applyPairBind(from, toObj, toKey) {
+        toObj[toKey] = getValue(this.source, [from]);
     }
 
     applyBindValue(elem, expressionName, params, bindName) {
@@ -311,6 +334,18 @@ class HtmlBinder {
         });
     }
 
+    getArtifacts() {
+        return {
+            origin: this.origin,
+            source: this.source,
+            handlers: this.handlers,
+            binds: this.binds,
+            root: this.root,
+            components: this.components,
+            blocks: this.blocks
+        };
+    }
+
     static replaceInlineBindings(elem) {
         elem.innerHTML = elem.innerHTML.replace(allSpanRegex, (all, prefixSlash, match) => prefixSlash ? all.substr(1) : `<span bind="${match}"></span>`);
         elem.innerHTML = elem.innerHTML.replace(allSpanExpressionRegex, (all, prefixSlash, match) => prefixSlash ? all.substr(1) : `<span bind="${match}"></span>`);
@@ -323,10 +358,11 @@ class HtmlBinder {
 
 // binds = {
 //     'a.b.c': {
+//         attributes: [attributeBind1, attributeBind2],
 //         fors: [{container, outerElem, sourceTo, sourceFrom, sourceLinks}],
 //         ifs: [expressionBind1, expressionBind3],
-//         values: [expressionBind1, expressionBind2],
-//         attributes: [attributeBind1, attributeBind2]
+//         pairs: [{from, toObj, toKey}],
+//         values: [expressionBind1, expressionBind2]
 //     }
 // };
 //
