@@ -2,7 +2,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 </head>
 
-<div bind-block="navigation with navigationPages setPageIndex"></div>
+<div bind-block="navigation with navigationPages setPageIndex as navigationBlock"></div>
 
 <div bind-block="helloWorld" bind-if="=(pageIndex, 0)"></div>
 <div bind-block="bindFor" bind-if="=(pageIndex, 1)"></div>
