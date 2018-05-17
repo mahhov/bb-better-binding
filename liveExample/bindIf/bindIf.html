@@ -1,3 +1,19 @@
-<div bind-if="show">message</div>
-<div bind-if="not(show)">message</div>
-<div bind-if=">(number, 5)">message</div>
+<div>
+    <span>truthy:</span>
+    <span bind-if="truthy">whenever `source.truthy` is modified, my visibility will be updated to reflect the change</span>
+</div>
+
+<div>
+    <span>falsy:</span>
+    <span bind-if="falsy">whenever `source.falsy` is modified, my visibility will be updated to reflect the change</span>
+</div>
+
+<div>
+    <span>isGreaterThan10(myVariable):</span>
+    <span bind-if="isGreaterThan10(myVariable)">whenever `source.isGreaterThan10` or `source.myVariable` are modified, my visibility be updated to reflect the change</span>
+</div>
+
+<div>
+    <span>isGreaterThan10(5):</span>
+    <span bind-if="isGreaterThan10(5)">whenever `source.isGreaterThan10` is modified, my visibility be updated to reflect the change</span>
+</div>

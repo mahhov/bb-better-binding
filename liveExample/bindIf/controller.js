@@ -1,3 +1,9 @@
 module.exports = source => {
-    source.list = ['elephant', 'lion', 'rabbit'];
+    source.truthy = true;
+
+    source.falsy = false;
+
+    source.isGreaterThan10 = a => a > 10;
+
+    source.myVariable = 15;
 };
