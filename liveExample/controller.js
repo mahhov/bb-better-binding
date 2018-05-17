@@ -1,16 +1,28 @@
 const bb = require('bb-better-binding')();
 
+// block declarations
+
 bb.declareBlock('navigation', require('./navigation/navigation'));
-bb.declareBlock('helloWorld', require('./helloWorld/helloWorld'));
+
+let valueBlockData = require('./bindFor/bindFor');
+bb.declareBlock('bindValue', valueBlockData);
+
+let ifBlockData = require('./bindFor/bindFor');
+bb.declareBlock('bindIf', ifBlockData);
 
 let forBlockData = require('./bindFor/bindFor');
 bb.declareBlock('bindFor', forBlockData);
 
-let snippets = [, forBlockData];
+bb.declareBlock('helloWorld', require('./helloWorld/helloWorld'));
+
+// booting
 
 let source = bb.boot(document.firstElementChild, window);
 
-source.navigationPages = ['Hello World', 'For Binding'];
+// app controller, todo: seperate into block
+
+let snippets = [valueBlockData, ifBlockData, forBlockData];
+source.navigationPages = ['Value Binding', 'If Binding', 'For Binding', 'Hello World'];
 source.setPageIndex = pageIndex => {
     source.pageIndex = pageIndex;
     source.snippet = snippets[pageIndex] && {
@@ -18,5 +30,5 @@ source.setPageIndex = pageIndex => {
         controller: snippets[pageIndex].controllerString
     };
 };
-source.pageIndex = 0;
+source.setPageIndex(0);
 source.navigationBlock.navigationRadio0.checked = true;
