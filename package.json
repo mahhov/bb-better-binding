@@ -6,9 +6,9 @@
   "scripts": {
     "dev-live": "nodemon --watch liveExample --watch src -e html,js --exec npm run build-live-example & http-server ./build -o -a localhost -c-1",
     "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build -o -a localhost -c-1",
-    "build-example": "[ -d build ] && rm -r build; cp -r example build; browserify -t brfs --debug example/controller.js -o build/controller.js; cp favicon.ico build",
-    "build-live-example": "[ -d build ] && rm -r build; cp -r liveExample build; browserify -t brfs --debug liveExample/controller.js -o build/controller.js; cp favicon.ico build",
-    "build-docs": "[ -d docs ] && rm -r docs; npm run build-example && cp -r build docs",
+    "build-example": "[ -d build ] && rm -r build; mkdir build; cp example/index.html build; browserify -t brfs --debug example/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-live-example": "[ -d build ] && rm -r build; mkdir build; cp liveExample/index.html build; browserify -t brfs --debug liveExample/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-docs": "[ -d docs ] && rm -r docs; npm run build-live-example && cp -r build docs",
     "postversion": "git push && git push --tags && npm publish"
   },
   "author": "mahhov",

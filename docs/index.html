@@ -2,30 +2,89 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 </head>
 
-<div>
-    <div style="font-size:${largeFont}; color:${favoriteColor}">
-        $s{greeting}, $s{name} $s{exclamation}
-    </div>
-    wuts ur favorite color?
-    <input value="${favoriteColor}" onkeyup="${changeColor(this)}">
-</div>
+<p>This site was created using bb-better-binding</p>
 
-<div style="margin-top:100px">
-    <button onclick="${changeAnimation()}">click me!</button>
-    <br/>
-    <img src="${animation}">
-</div>
+<div bind-block="navigation with navigationPages setPageIndex as navigationBlock"></div>
 
-<div style="margin-top:100px">
-    <p>i have jokes:</p>
-    <input id="check" type="checkbox" onchange="${setJokeVisibility(this)}"/><label for="check">show jokes?</label>
-    <div bind-if="jokeVisibility">
-        <div bind-for="joke in jokes">
-            <h3 bind="index"></h3>
-            <p bind-for="line in joke.lines" bind="line"></p>
+<div class="section" bind-if="snippet">
+    <div class="two-rows">
+        <div class="two-columns">
+            <a class="half" href="${links.0}">source</a>
+            <a class="half" href="${links.1}">source</a>
         </div>
-        <h3>Source: $s{jokesSource}</h3>
+        <div class="two-columns">
+            <pre class="half" bind="snippet.template"></pre>
+            <pre class="half" bind="snippet.controller"></pre>
+        </div>
     </div>
 </div>
+
+<div class="section indented">
+    <div bind-block="bindValue" bind-if="=(pageIndex, 0)"></div>
+    <div bind-block="bindIf" bind-if="=(pageIndex, 1)"></div>
+    <div bind-block="bindFor" bind-if="=(pageIndex, 2)"></div>
+    <div bind-block="helloWorld" bind-if="=(pageIndex, 3)"></div>
+</div>
+
+<style>
+    * {
+        font-family: Verdana, Geneva, sans-serif;
+    }
+
+    .indented {
+        margin: 10px;
+    }
+
+    .section {
+        margin-top: 50px;
+    }
+
+    .two-rows {
+        display: grid;
+        grid-template-rows: auto auto;
+    }
+
+    .two-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-row: span 1;
+    }
+
+    .half {
+        grid-column: span 1;
+        margin: 10px;
+    }
+
+    pre {
+        font-family: Consolas, monaco, monospace;
+        font-size: 13px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        background-color: #f5f5f5;
+        color: blue;
+        white-space: pre-wrap;
+    }
+
+    input[type=radio], input[type=checkbox] {
+        display: none;
+    }
+
+    button, label {
+        border: none;
+        padding: 3px 8px;
+        background: lightskyblue;
+        color: white;
+        transition: 0.2s;
+        margin-right: 10px;
+    }
+
+    button:hover, label:hover {
+        background: cornflowerblue;
+    }
+
+    button:active, input[type=radio]:checked + label, input[type=checkbox]:checked + label {
+        background: darkcyan;
+    }
+</style>
 
 <script src="controller.js"></script>
