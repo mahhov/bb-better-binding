@@ -1,13 +1,17 @@
 const bb = require('bb-better-binding')();
 
+String.prototype.clean = function () {
+    return this.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
 // block declarations
 
 bb.declareBlock('navigation', require('./navigation/navigation'));
 
-let valueBlockData = require('./bindFor/bindFor');
+let valueBlockData = require('./bindValue/bindValue');
 bb.declareBlock('bindValue', valueBlockData);
 
-let ifBlockData = require('./bindFor/bindFor');
+let ifBlockData = require('./bindIf/bindIf');
 bb.declareBlock('bindIf', ifBlockData);
 
 let forBlockData = require('./bindFor/bindFor');
@@ -19,15 +23,15 @@ bb.declareBlock('helloWorld', require('./helloWorld/helloWorld'));
 
 let source = bb.boot(document.firstElementChild, window);
 
-// app controller, todo: seperate into block
+// app controller
 
 let snippets = [valueBlockData, ifBlockData, forBlockData];
 source.navigationPages = ['Value Binding', 'If Binding', 'For Binding', 'Hello World'];
 source.setPageIndex = pageIndex => {
     source.pageIndex = pageIndex;
     source.snippet = snippets[pageIndex] && {
-        template: snippets[pageIndex].template.replace('<', '&lt;'),
-        controller: snippets[pageIndex].controllerString
+        template: snippets[pageIndex].template.clean(),
+        controller: snippets[pageIndex].controllerString.clean()
     };
 };
 source.setPageIndex(0);
