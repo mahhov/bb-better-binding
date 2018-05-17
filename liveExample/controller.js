@@ -25,14 +25,22 @@ let source = bb.boot(document.firstElementChild, window);
 
 // app controller
 
+
 let snippets = [valueBlockData, ifBlockData, forBlockData];
+let linkNames = ['bindValue', 'bindIf', 'bindFor', 'helloWorld'];
 source.navigationPages = ['Value Binding', 'If Binding', 'For Binding', 'Hello World'];
+
 source.setPageIndex = pageIndex => {
     source.pageIndex = pageIndex;
     source.snippet = snippets[pageIndex] && {
         template: snippets[pageIndex].template.clean(),
         controller: snippets[pageIndex].controllerString.clean()
     };
+
+    let linkName = linkNames[pageIndex];
+    let linkExpanded = `https://github.com/mahhov/bb-better-binding/blob/HEAD/liveExample/${linkName}/${linkName}`;
+    source.links = [`${linkExpanded}.html`, `${linkExpanded}.js`];
 };
+
 source.setPageIndex(0);
 source.navigationBlock.navigationRadio0.checked = true;

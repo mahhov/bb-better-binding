@@ -7,9 +7,15 @@
 <div bind-block="navigation with navigationPages setPageIndex as navigationBlock"></div>
 
 <div class="section" bind-if="snippet">
-    <div class="two-columns">
-        <pre class="half" bind="snippet.template"></pre>
-        <pre class="half" bind="snippet.controller"></pre>
+    <div class="two-rows">
+        <div class="two-columns">
+            <a class="half" href="${links.0}" bind="links[0]"></a>
+            <a class="half" href="${links.1}" bind="links[1]"></a>
+        </div>
+        <div class="two-columns">
+            <pre class="half" bind="snippet.template"></pre>
+            <pre class="half" bind="snippet.controller"></pre>
+        </div>
     </div>
 </div>
 
@@ -33,9 +39,15 @@
         margin-top: 50px;
     }
 
+    .two-rows {
+        display: grid;
+        grid-template-rows: auto auto;
+    }
+
     .two-columns {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        grid-row: span 1;
     }
 
     .half {

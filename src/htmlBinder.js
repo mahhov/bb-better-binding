@@ -354,6 +354,7 @@ class HtmlBinder {
         elem.innerHTML = elem.innerHTML.replace(allSpanExpressionRegex, (all, prefixSlash, match) => prefixSlash ? all.substr(1) : `<span bind="${match}"></span>`);
     }
 
+    // todo use indexToDot for attribute binds as well, e.g. <div style="${color[0]}"> abc </div>
     static getBindAttribute(elem, attribute) {
         return indexToDot(elem.getAttribute(attribute));
     }
