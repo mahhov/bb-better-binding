@@ -1,8 +1,6 @@
-let template = require('fs').readFileSync(`${__dirname}/bindFor.html`, 'utf8');
+const fs = require('fs');
+let template = fs.readFileSync(`${__dirname}/bindFor.html`, 'utf8');
+let controllerString = fs.readFileSync(`${__dirname}/controller.js`, 'utf8');
+let controller = require('./controller');
 
-let controller = source => {
-    source.name = 'james';
-    source.list = ['elephant', 'lion', 'rabbit'];
-};
-
-module.exports = {template, controller};
+module.exports = {template, controller, controllerString};
