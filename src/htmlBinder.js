@@ -94,7 +94,7 @@ class HtmlBinder {
                     this.applyBindIf(elem, expressionName, params, bindName);
                 }
 
-                // todo allow non-source parameters for bindUse and bindBlock
+                // todo allow non-source parameters for bindUse
                 if (bindUse) {
                     let [componentName, paramsGroup] = splitByWord(bindUse, 'with');
                     let paramsInput = splitBySpace(paramsGroup);
@@ -111,7 +111,8 @@ class HtmlBinder {
                     skip = true;
                     let [block, blockTo] = splitByWord(bindBlock, 'as');
                     let [blockName, paramsGroup] = splitByWord(block, 'with');
-                    let paramsInput = paramsGroup ? splitBySpace(paramsGroup) : [];
+                    let paramsInput = paramsGroup ? splitByParams(paramsGroup) : [];
+                    let paramValues = this.getParamValues(paramsInput, elem);
                     let {template, controller, parameters} = this.blocks[blockName];
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
@@ -121,7 +122,9 @@ class HtmlBinder {
                         let from = translate(paramsInput[index], sourceLinks);
                         this.addPairBind(from, blockSource, to);
                         this.applyPairBind(from, blockSource, to);
+                        blockSource[to] = paramValues[index];
                     });
+
                     if (blockTo)
                         this.source[blockTo] = blockSource;
                     // todo debugger for block bindings
