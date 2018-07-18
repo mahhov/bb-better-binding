@@ -19,9 +19,9 @@ run: `npm i -save bb-beter-binding`
 ### your `.html` template
 
 ```html
-<div bind-if="showNumbers"></div>
+<div bind-if="showNumbers"> </div>
     <div bind-for="num in numbers">
-        <div bind="num"></div>
+        <div bind="num"> </div>
     </div>
 </div>
 
@@ -47,11 +47,11 @@ source.changeHandler = () => {
 
 ```html
 <div bind-for="overdueBook in overdueBooks">
-    <div bind-use="libraryDue with overdueBook.dueDate overdueBook.title overdueBook.titleColor"></div>
+    <div bind-use="libraryDue with overdueBook.dueDate overdueBook.title overdueBook.titleColor"> </div>
 </div>
 
 <div bind-component="libraryDue with date book titleColor">
-    <div style="color:${titleColor}; font-size:${fontSize}px" bind="book"></div>
+    <div style="color:${titleColor}; font-size:${fontSize}px" bind="book"> </div>
     <div>due on $s{date}</div>
 </div>
 ```
@@ -123,33 +123,31 @@ Components are loaded from bottom of the document, upwards. This means, if `comp
 
 ```html
 <!-- parent template -->
-<div bind-block="todoList"> </div>
+<div bind-block="todoList with 'red', name"> </div>
 ```
 
 ```js
 // parent controller
 const bb = require('bb-better-binding')();
 bb.declareBlock('todoList', require('./todoListBlock/todoList'));
-bb.boot(document.firstElementChild);
+const source = bb.boot(document.firstElementChild);
+source.name = 'The Elephant\'s Todo List';
 ```
 
 ```html
 <!-- todoList.html template -->
-hi there $s{name}
-<div bind-for="item in list" bind="item"></div>
+<div style="color:${color}">List Name: $s{name}</div>
+<div bind-for="item in list" bind="item"> </div>
 ```
 
 ```js
 // todoList.js controller
-
 let template = require('fs').readFileSync(`${__dirname}/todoList.html`, 'utf8');
-
 let controller = source => {
-    source.name = 'james';
     source.list = ['elephant', 'lion', 'rabbit'];
 };
-
-module.exports = {template, controller};
+let parameters = ['color', 'name'];
+module.exports = {template, controller, parameters};
 ```
 
 Creates externalized and reusable blocks
