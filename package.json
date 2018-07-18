@@ -4,10 +4,12 @@
   "description": "1 way data binding from javascript controller to html template",
   "main": "src/index.js",
   "scripts": {
+    "dev": "nodemon --watch dev --watch src -e html,js --exec npm run build-dev & http-server ./build -o -a localhost -c-1",
     "dev-live": "nodemon --watch liveExample --watch src -e html,js --exec npm run build-live-example & http-server ./build -o -a localhost -c-1",
     "dev-example": "nodemon --watch example --watch src -e html,js --exec npm run build-example & http-server ./build -o -a localhost -c-1",
-    "build-example": "[ -d build ] && rm -r build; mkdir build; cp example/index.html build; browserify -t brfs --debug example/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-dev": "[ -d build ] && rm -r build; mkdir build; cp dev/index.html build; browserify -t brfs --debug dev/controller.js -o build/controller.js; cp favicon.ico build",
     "build-live-example": "[ -d build ] && rm -r build; mkdir build; cp liveExample/index.html build; browserify -t brfs --debug liveExample/controller.js -o build/controller.js; cp favicon.ico build",
+    "build-example": "[ -d build ] && rm -r build; mkdir build; cp example/index.html build; browserify -t brfs --debug example/controller.js -o build/controller.js; cp favicon.ico build",
     "build-docs": "[ -d docs ] && rm -r docs; npm run build-live-example && cp -r build docs",
     "postversion": "git push && git push --tags && npm publish"
   },
