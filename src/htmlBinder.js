@@ -52,8 +52,9 @@ class HtmlBinder {
                 setProperty(this.source, [bindElem], elem);
                 this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
                 this.source.__bindIgnore__.push(bindElem);
+            }
 
-            } else if (bindComponent) {
+            if (bindComponent) {
                 skip = true;
                 let [componentName, paramsGroup] = splitByWord(bindComponent, 'with');
                 let params = splitBySpace(paramsGroup);

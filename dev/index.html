@@ -1,12 +1,4 @@
-<div bind="func(x, 'x')"></div>
-<div bind="func(x.y1, 'x.y1')"></div>
-<div bind="func(x.y1.z1, 'x.y1.z1')"></div>
-<div bind="func(x.y1.z2, 'x.y1.z2')"></div>
-<div bind="func(x.y2, 'x.y2')"></div>
-<div bind="func(x.y2.z, 'x.y2.z')"></div>
-
-<div bind="counter()"></div>
-
-<div bind-block="myBlock with 'red', 'jacob' as 1"></div>
+<input bind-elem="input" oninput="${update()}" autofocus>
+<div bind-elem="outputDiv" bind="output"></div>
 
 <script src="controller.js"></script>
