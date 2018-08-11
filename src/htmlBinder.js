@@ -125,11 +125,15 @@ class HtmlBinder {
                         blockSource[to] = paramValues[index];
                     });
 
-                    if (blockTo) { // todo make blockTo required
+                    if (blockTo) {
                         this.source[blockTo] = blockSource;
                         this.handlers[blockTo] = blockHandlers;
+                    } else {
+                        this.source._unnamedBlocks_ = this.source._unnamedBlocks_ || [];
+                        this.handlers._unnamedBlocks_ = this.handlers._unnamedBlocks_ || [];
+                        this.source._unnamedBlocks_.push(blockSource);
+                        this.handlers._unnamedBlocks_.push(blockHandlers);
                     }
-                    // todo debugger for block bindings
                 }
 
                 if (bindValue) {
