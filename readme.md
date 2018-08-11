@@ -184,15 +184,13 @@ for example, if `source.isBetterNumber = (a, b) => a > b;` and `source.value = 3
 ### element binding
 
 ```html
-<button bind-elem="elems.playButton" onclick="${playAudio()}"> </button>
-<audio src="howToStealAWalrus.mp3" type="audio/webm" bind-elem="elems.audioBook"> </audio>
+<button bind-elem="playButton" onclick="${playAudio()}"> </button>
+<audio src="howToStealAWalrus.mp3" type="audio/webm" bind-elem="audioBook"> </audio>
 ```
 
 ```js
-source.elems.playButton.innerText = 'click me to begin ur audiobook!';
-source.playAudio = () => {
-    source.elems.audioBook.play();
-};
+source.playButton.innerText = 'click me to begin ur audiobook!';
+source.playAudio = () => source.audioBook.play();
 ```
 
 sets a field on source to the html element.
