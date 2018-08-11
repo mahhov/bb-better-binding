@@ -351,7 +351,7 @@ source.func = obj => {
 
 ### 1
 
-Bindings are designed to only trigger when `source` is modified.
+Bindings are triggered when source is modified, even if indirectly (e.g. `value3` in below example).
 
 ```html
 $s{obj.value1}
@@ -365,8 +365,6 @@ source.obj = obj;
 source.obj.value2 = 22;
 obj.value3 = 33;
 ```
-
-The example above displays `1`, `22`, and `3`. The last assignment `obj.value3 = 33` does not trigger the `obj.value3` binding as it is directly modifying `obj` and not `source.obj`.
 
 ### 2
 
@@ -384,6 +382,32 @@ source.obj.flag = true;
 ```
 
 The example above displays `hi there`. Modifying the field `flag` on object `source.obj` triggers the binding on `obj`, even though there are no direct bindings on `obj.flag`.
+
+### 3
+
+By default bindings are triggered asynchroniously.
+
+This is fine because, except for element bindings, all other bindings are 1 way; modifying `source` updates the `html`, but user modifications to the `html` are projected to source either though event listeners or by element bindings. In order to make sure element bindings can be accessed syncrhoniously in your app, on fetching element bindings, all bindings queued to be triggered will trigger.
+
+```html
+
+```
+
+```js
+
+```
+
+### 4
+
+It is possible to disable automatic binding triggering. This is useful when building an app that already has a "loop."
+
+```html
+
+```
+
+```js
+
+```
 
 ## execution order of bindings
 
