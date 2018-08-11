@@ -5,7 +5,6 @@ let createSource = () => {
     setDefaultSource(source);
     let compareSource = {};
     source.invokeAllHandlers = () => handleOriginChanges(source, compareSource, handlers);
-    setInterval(() => source.invokeAllHandlers(), 1);
     return {source, handlers};
 };
 
@@ -94,3 +93,8 @@ let setDefaultSource = source => {
 };
 
 module.exports = {createSource};
+
+// todo
+// on get elem, synch
+// send block source handlers to parent source
+// allow manual triggering of handler checks

@@ -115,7 +115,7 @@ class HtmlBinder {
                     let {template, controller, parameters} = this.blocks[blockName];
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
-                    let blockSource = new HtmlBinder(elem, this.blocks).source;
+                    let {source: blockSource, handlers: blockHandlers} = new HtmlBinder(elem, this.blocks);
                     controller(blockSource);
                     parameters && parameters.forEach((to, index) => {
                         let from = translate(paramsInput[index], sourceLinks);
@@ -124,8 +124,10 @@ class HtmlBinder {
                         blockSource[to] = paramValues[index];
                     });
 
-                    if (blockTo)
+                    if (blockTo) { // todo make blockTo required
                         this.source[blockTo] = blockSource;
+                        this.handlers[blockTo] = blockHandlers;
+                    }
                     // todo debugger for block bindings
                 }
 

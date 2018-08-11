@@ -43,4 +43,4 @@ source.setPageIndex = pageIndex => {
 };
 
 source.setPageIndex(0);
-source.navigationBlock.navigationRadio0.checked = true;
+// source.navigationBlock.navigationRadio0.checked = true;
