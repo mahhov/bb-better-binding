@@ -19,7 +19,7 @@ class Booter {
     }
 
     tick() {
-        source.invokeAllHandlers()
+        source.invokeAllHandlers();
     }
 
     loop(interval = 1) {

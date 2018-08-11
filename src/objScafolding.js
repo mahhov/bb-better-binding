@@ -22,6 +22,19 @@ let setProperty = (obj, paths, value) => {
     property[0][property[1]] = value;
 };
 
+let setGetProperty = (obj, paths, value, handler) => {
+    let property = createProperty(obj, paths);
+    let key = property[1] + '_';
+    property[0][key] = value;
+
+    Object.defineProperty(property[0], property[1], {
+        get: () => {
+            handler();
+            return property[0][key];
+        }
+    });
+};
+
 let clone = original => {
     return Object.assign({}, original);
 };
@@ -49,4 +62,4 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
-module.exports = {getValue, setProperty, clone, translate, indexToDot, notUndefined};
+module.exports = {getValue, setProperty, setGetProperty, clone, translate, indexToDot, notUndefined};

@@ -1,4 +1,4 @@
-const {getValue, setProperty, clone, translate, indexToDot, notUndefined} = require('./objScafolding');
+const {getValue, setProperty, setGetProperty, clone, translate, indexToDot, notUndefined} = require('./objScafolding');
 const {splitByWord, splitByComma, splitBySpace} = require('./stringSplitter');
 const splitByParams = require('./paramSplitter');
 const {createSource} = require('./source');
@@ -49,7 +49,7 @@ class HtmlBinder {
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindElem) {
-                setProperty(this.source, [bindElem], elem);
+                setGetProperty(this.source, [bindElem], elem, this.source.invokeAllHandlers);
                 this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
                 this.source.__bindIgnore__.push(bindElem);
             }

@@ -193,7 +193,9 @@ source.playButton.innerText = 'click me to begin ur audiobook!';
 source.playAudio = () => source.audioBook.play();
 ```
 
-sets a field on source to the html element.
+sets a field on source to the html element. 
+
+element bindings are read only; e.g `source.playButton` and `source.audioBook` are not reassignable in the above example.
 
 ## utility expressions available by default for `bind-if` and `bind`
 
