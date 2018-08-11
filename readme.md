@@ -184,8 +184,8 @@ for example, if `source.isBetterNumber = (a, b) => a > b;` and `source.value = 3
 ### element binding
 
 ```html
-<button bind-elem="elems.playButton" onclick="${playAudio()}"> </div>
-<audio src="howToStealAWalrus.mp3" type="audio/webm" bind-elem="elems.audioBook"> </div>
+<button bind-elem="elems.playButton" onclick="${playAudio()}"> </button>
+<audio src="howToStealAWalrus.mp3" type="audio/webm" bind-elem="elems.audioBook"> </audio>
 ```
 
 ```js
