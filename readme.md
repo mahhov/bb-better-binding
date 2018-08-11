@@ -416,7 +416,7 @@ A second optional argument may be passed to the `boot` method in order to put th
 
 `const source = require('bb-better-binding')().boot(document.firstElementChild, window);`
 
-Which results in creating the fields `window.source`, `window.binds`, `window.handlers`, `window.components`, and `window.origin` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds`, `handlers`, `components`, and `origin` should not be modified unless you understand the source code.
+Which results in creating the fields `window.source`, `window.binds`, `window.handlers`, and `window.components` with the purpose of making debugging easier. Note, this should only be used for debugging, and `binds`, `handlers`, and `components` should not be modified unless you understand the source code.
 
 ### binds
 
@@ -477,18 +477,3 @@ components = {
         params: []
     }
 };
-```
-
-### origin
-
-`origin` provides a convenient way to view the contents of `source` without a distracting `proxy` wrapper 
-
-```js
-origin = {
-    a: {
-        b: {
-            c: {}
-        }
-    }
-};
-```

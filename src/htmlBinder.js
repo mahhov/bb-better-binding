@@ -7,8 +7,7 @@ const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, fu
 class HtmlBinder {
 
     constructor(root, blocks) {
-        let {origin, source, handlers} = createSource();
-        this.origin = origin;
+        let {source, handlers} = createSource();
         this.source = source;
         this.handlers = handlers;
         this.binds = {};
@@ -342,7 +341,6 @@ class HtmlBinder {
 
     getArtifacts() {
         return {
-            origin: this.origin,
             source: this.source,
             handlers: this.handlers,
             binds: this.binds,

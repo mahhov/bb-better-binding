@@ -1,9 +1,12 @@
+// todo wrap these functions in a class
 let createSource = () => {
     let handlers = {};
-    let origin = {};
-    let source = createProxy(origin, handlers);
-    setDefaultSource(origin);
-    return {origin, source, handlers};
+    let source = {};
+    setDefaultSource(source);
+    let compareSource = {};
+    source.invokeAllHandlers = () => handleOriginChanges(source, compareSource, handlers);
+    setInterval(() => source.invokeAllHandlers(), 1);
+    return {source, handlers};
 };
 
 let ignore = [];
@@ -20,18 +23,6 @@ let handleSet = (obj, prop, handlers, accumulatedHandlers) => {
     ignore.pop();
 };
 
-let createProxy = (obj, handlers = {}, accumulatedHandlers = []) => new Proxy(obj, {
-    get: (target, prop) => {
-        let got = Reflect.get(target, prop);
-        return typeof got === 'object' && got && !isBindIgnored(obj, prop) ? createProxy(got, handlers[prop], accumulatedHandlers.concat(handlers)) : got;
-    },
-    set: (target, prop, value) => {
-        Reflect.set(target, prop, value);
-        !isIgnored(obj, prop) && handleSet(obj, prop, handlers[prop], accumulatedHandlers.concat(handlers)); // todo wrap handlers and accumulatedHandlers in class with popProp method
-        return true;
-    }
-});
-
 let propogateHandlerDown = handlers => {
     doHandler(handlers);
     Object.entries(handlers)
@@ -40,6 +31,38 @@ let propogateHandlerDown = handlers => {
 };
 
 let doHandler = handler => typeof handler._func_ === 'function' && handler._func_();
+
+let handleOriginChangesKey = (source, compareSource, key, handlers = {}, accumulatedHandlers = []) => {
+    if (isBindIgnored(source, key))
+        return;
+    let value = source[key];
+    let compareValue = compareSource[key];
+    if (isObject(value) && isObject(compareValue))
+        handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers)); // todo use push for efficiency
+    else if (value !== compareValue) {
+        compareSource[key] = copy(value);
+        handleSet(source, key, handlers[key], accumulatedHandlers.concat(handlers)); // todo wrap handlers and accumulatedHandlers in class with popProp method
+    }
+};
+
+// source and compareSource must not be null or undefined
+let handleOriginChanges = (source, compareSource, handlers = {}, accumulatedHandlers = []) => {
+    if (!handlers)
+        return;
+    Object.keys(source).forEach(key => handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers));
+    Object.keys(compareSource).forEach(key => !source.hasOwnProperty(key) && handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers));
+};
+
+// todo move these funcitons to obj scafollding util module
+let isObject = obj => typeof obj === 'object' && obj;
+
+let copy = obj => {
+    if (!isObject(obj))
+        return obj;
+    let copyObj = {};
+    Object.entries(obj).forEach(([key, value]) => copyObj[key] = copy(value));
+    return copyObj;
+};
 
 let setDefaultSource = source => {
     source._numbers_ = new Proxy({}, {
