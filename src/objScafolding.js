@@ -60,6 +60,8 @@ let notUndefined = (value, undefinedValue = null) =>
 
 let isObject = obj => typeof obj === 'object' && obj;
 
+let areEqual = (a, b) => a === b || isNaN((a) && isNaN(b)); // thanks js!
+
 let clone = original => {
     return {...original};
 };
@@ -72,4 +74,4 @@ let cloneDeep = obj => {
     return cloneObj;
 };
 
-module.exports = {getValue, setProperty, setGetProperty, translate, indexToDot, notUndefined, isObject, clone, cloneDeep};
+module.exports = {getValue, setProperty, setGetProperty, translate, indexToDot, notUndefined, isObject, areEqual, clone, cloneDeep};

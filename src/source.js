@@ -1,4 +1,4 @@
-const {isObject, cloneDeep} = require('./objScafolding');
+const {isObject, areEqual, cloneDeep} = require('./objScafolding');
 
 // todo wrap these functions in a class
 let createSource = () => {
@@ -40,7 +40,7 @@ let handleOriginChangesKey = (source, compareSource, key, handlers = {}, accumul
     let compareValue = compareSource[key];
     if (isObject(value) && isObject(compareValue))
         return handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers));
-    if (value !== compareValue) {
+    if (!areEqual(value, compareValue)) {
         compareSource[key] = cloneDeep(value);
         handleSet(source, key, handlers[key], accumulatedHandlers.concat(handlers)); // todo wrap handlers and accumulatedHandlers in class with popProp method
         return true;
@@ -94,5 +94,3 @@ module.exports = {createSource};
 
 // todo
 // on get elem, synch
-// send block source handlers to parent source
-// allow manual triggering of handler checks
