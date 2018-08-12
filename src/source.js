@@ -10,10 +10,10 @@ let createSource = () => {
 
 let ignore = [];
 
-let isBindIgnored = (obj, prop) => obj.__bindIgnore__ && obj.__bindIgnore__.includes(prop); // todo replace double underscores with single underscores to be consistent
+let isBindIgnored = (obj, prop) => obj._bindIgnore_ && obj._bindIgnore_.includes(prop);
 
-// todo make __bindAvoidCycles__ inherited and maybe avoid per binding instead per change
-let isIgnored = (obj, prop) => isBindIgnored(obj, prop) || (obj.__bindAvoidCycles__ && ignore.some(ignore => ignore.obj === obj && ignore.prop === prop));
+// todo make _bindAvoidCycles_ inherited and maybe avoid per binding instead per change
+let isIgnored = (obj, prop) => isBindIgnored(obj, prop) || (obj._bindAvoidCycles_ && ignore.some(ignore => ignore.obj === obj && ignore.prop === prop));
 
 let handleSet = (obj, prop, handlers, accumulatedHandlers) => {
     ignore.push({obj, prop});

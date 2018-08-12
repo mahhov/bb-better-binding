@@ -50,8 +50,8 @@ class HtmlBinder {
 
             if (bindElem) {
                 setGetProperty(this.source, [bindElem], elem, this.source._invokeAllHandlers_);
-                this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
-                this.source.__bindIgnore__.push(bindElem);
+                this.source._bindIgnore_ = this.source._bindIgnore_ || [];
+                this.source._bindIgnore_.push(bindElem);
             }
 
             if (bindComponent) {
