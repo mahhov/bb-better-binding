@@ -43,4 +43,6 @@ source.setPageIndex = pageIndex => {
 };
 
 source.setPageIndex(0);
-// source.navigationBlock.navigationRadio0.checked = true;
+
+bb.tick(); // todo make this obsolete via adding getElem method
+source.navigationBlock.navigationRadio0.checked = true;

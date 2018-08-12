@@ -37,10 +37,11 @@ let handleOriginChangesKey = (source, compareSource, key, handlers = {}, accumul
     let value = source[key];
     let compareValue = compareSource[key];
     if (isObject(value) && isObject(compareValue))
-        handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers)); // todo use push for efficiency
-    else if (value !== compareValue) {
+        return handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers)); // todo use push for efficiency
+    if (value !== compareValue) {
         compareSource[key] = copy(value);
         handleSet(source, key, handlers[key], accumulatedHandlers.concat(handlers)); // todo wrap handlers and accumulatedHandlers in class with popProp method
+        return true;
     }
 };
 
@@ -48,8 +49,14 @@ let handleOriginChangesKey = (source, compareSource, key, handlers = {}, accumul
 let handleOriginChanges = (source, compareSource, handlers = {}, accumulatedHandlers = []) => {
     if (!handlers)
         return;
-    Object.keys(source).forEach(key => handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers));
-    Object.keys(compareSource).forEach(key => !source.hasOwnProperty(key) && handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers));
+    let changed = true;
+    while (changed) {
+        changed = false;
+        Object.keys(source).forEach(key =>
+            changed = handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers) || changed);
+        Object.keys(compareSource).forEach(key =>
+            changed = !source.hasOwnProperty(key) && handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers) || changed);
+    }
 };
 
 // todo move these funcitons to obj scafollding util module
