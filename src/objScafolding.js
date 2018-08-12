@@ -35,10 +35,6 @@ let setGetProperty = (obj, paths, value, handler) => {
     });
 };
 
-let clone = original => {
-    return Object.assign({}, original);
-};
-
 let translate = (name, links) => {
     let occurred = [];
     let fields = getFields([name]);
@@ -62,4 +58,18 @@ let indexToDot = field => field && field.replace(/\[(\w+)\]/g, (_, match) => `.$
 let notUndefined = (value, undefinedValue = null) =>
     value !== undefined ? value : undefinedValue;
 
-module.exports = {getValue, setProperty, setGetProperty, clone, translate, indexToDot, notUndefined};
+let isObject = obj => typeof obj === 'object' && obj;
+
+let clone = original => {
+    return {...original};
+};
+
+let cloneDeep = obj => {
+    if (!isObject(obj))
+        return obj;
+    let cloneObj = {};
+    Object.entries(obj).forEach(([key, value]) => cloneObj[key] = cloneDeep(value));
+    return cloneObj;
+};
+
+module.exports = {getValue, setProperty, setGetProperty, translate, indexToDot, notUndefined, isObject, clone, cloneDeep};

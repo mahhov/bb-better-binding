@@ -1,3 +1,5 @@
+const {isObject, cloneDeep} = require('./objScafolding');
+
 // todo wrap these functions in a class
 let createSource = () => {
     let handlers = {};
@@ -37,9 +39,9 @@ let handleOriginChangesKey = (source, compareSource, key, handlers = {}, accumul
     let value = source[key];
     let compareValue = compareSource[key];
     if (isObject(value) && isObject(compareValue))
-        return handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers)); // todo use push for efficiency
+        return handleOriginChanges(value, compareValue, handlers[key], accumulatedHandlers.concat(handlers));
     if (value !== compareValue) {
-        compareSource[key] = copy(value);
+        compareSource[key] = cloneDeep(value);
         handleSet(source, key, handlers[key], accumulatedHandlers.concat(handlers)); // todo wrap handlers and accumulatedHandlers in class with popProp method
         return true;
     }
@@ -57,17 +59,6 @@ let handleOriginChanges = (source, compareSource, handlers = {}, accumulatedHand
         Object.keys(compareSource).forEach(key =>
             changed = !source.hasOwnProperty(key) && handleOriginChangesKey(source, compareSource, key, handlers, accumulatedHandlers) || changed);
     }
-};
-
-// todo move these funcitons to obj scafollding util module
-let isObject = obj => typeof obj === 'object' && obj;
-
-let copy = obj => {
-    if (!isObject(obj))
-        return obj;
-    let copyObj = {};
-    Object.entries(obj).forEach(([key, value]) => copyObj[key] = copy(value));
-    return copyObj;
 };
 
 let setDefaultSource = source => {
