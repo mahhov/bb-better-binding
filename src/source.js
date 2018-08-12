@@ -4,7 +4,7 @@ let createSource = () => {
     let source = {};
     setDefaultSource(source);
     let compareSource = {};
-    source.invokeAllHandlers = () => handleOriginChanges(source, compareSource, handlers);
+    source._invokeAllHandlers_ = () => handleOriginChanges(source, compareSource, handlers);
     return {source, handlers};
 };
 

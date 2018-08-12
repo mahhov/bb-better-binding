@@ -19,11 +19,11 @@ class Booter {
     }
 
     tick() {
-        source.invokeAllHandlers();
+        source._invokeAllHandlers_();
     }
 
     loop(interval = 1) {
-        setInterval(() => source.invokeAllHandlers(), interval);
+        setInterval(() => source._invokeAllHandlers_(), interval);
     }
 }
 

@@ -49,7 +49,7 @@ class HtmlBinder {
             let bindValue = HtmlBinder.getBindAttribute(elem, 'bind');
 
             if (bindElem) {
-                setGetProperty(this.source, [bindElem], elem, this.source.invokeAllHandlers);
+                setGetProperty(this.source, [bindElem], elem, this.source._invokeAllHandlers_);
                 this.source.__bindIgnore__ = this.source.__bindIgnore__ || [];
                 this.source.__bindIgnore__.push(bindElem);
             }
