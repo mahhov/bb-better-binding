@@ -5,9 +5,8 @@ const {createSource} = require('./source');
 const {allSpanRegex, allSpanExpressionRegex, bindRegex, bindRegexUncapturing, functionRegex, expressionRegex} = require('./regex');
 
 class HtmlBinder {
-
-    constructor(root, blocks) {
-        let {source, handlers} = createSource();
+    constructor(root, blocks, parentSource) {
+        let {source, handlers} = createSource(parentSource);
         this.source = source;
         this.handlers = handlers;
         this.binds = {};
@@ -116,7 +115,7 @@ class HtmlBinder {
                     let {template, controller, parameters} = this.blocks[blockName];
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
-                    let {source: blockSource, handlers: blockHandlers} = new HtmlBinder(elem, this.blocks);
+                    let {source: blockSource, handlers: blockHandlers} = new HtmlBinder(elem, this.blocks, this.source);
                     controller(blockSource);
                     parameters && parameters.forEach((to, index) => {
                         let from = translate(paramsInput[index], sourceLinks);

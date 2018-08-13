@@ -1,12 +1,12 @@
-const {isObject, areEqual, cloneDeep} = require('./objScafolding');
+const {getValue, isObject, areEqual, cloneDeep} = require('./objScafolding');
 
 // todo wrap these functions in a class
-let createSource = () => {
+let createSource = parentSource => {
     let handlers = {};
     let source = {};
     setDefaultSource(source);
     let compareSource = {};
-    source._invokeAllHandlers_ = () => handleOriginChanges(source, compareSource, handlers);
+    source._invokeAllHandlers_ = parentSource ? parentSource._invokeAllHandlers_ : () => handleOriginChanges(source, compareSource, handlers);
     return {source, handlers};
 };
 
@@ -88,9 +88,10 @@ let setDefaultSource = source => {
     source.and = (...as) => as.every(a => a);
     source['&'] = source.and;
     source['&&'] = source.and;
+    source.getElem = elem => {
+        source._invokeAllHandlers_();
+        return getValue(source, [elem]);
+    }
 };
 
 module.exports = {createSource};
-
-// todo
-// on get elem, synch

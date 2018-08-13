@@ -25,7 +25,6 @@ let source = bb.boot(document.firstElementChild, window);
 
 // app controller
 
-
 let snippets = [valueBlockData, ifBlockData, forBlockData];
 let linkNames = ['bindValue', 'bindIf', 'bindFor', 'helloWorld'];
 source.navigationPages = ['Value Binding', 'If Binding', 'For Binding', 'Hello World'];
@@ -44,5 +43,4 @@ source.setPageIndex = pageIndex => {
 
 source.setPageIndex(0);
 
-bb.tick(); // todo make this obsolete via adding getElem method
-source.navigationBlock.navigationRadio0.checked = true;
+source.navigationBlock.init();
