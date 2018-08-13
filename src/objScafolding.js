@@ -60,7 +60,7 @@ let notUndefined = (value, undefinedValue = null) =>
 
 let isObject = obj => typeof obj === 'object' && obj;
 
-let areEqual = (a, b) => a === b || isNaN((a) && isNaN(b)); // thanks js!
+let areEqual = (a, b) => a === b || Number.isNaN(a) && Number.isNaN(b); // because NaN != NaN and isNan(undefined) == true, but Number.IsNan(undefined) == false
 
 let clone = original => {
     return {...original};
