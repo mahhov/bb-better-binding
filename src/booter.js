@@ -15,15 +15,15 @@ class Booter {
         debug && Object.assign(debug, artifacts);
         if (!manual)
             this.loop();
-        return artifacts.source;
+        return this.source = artifacts.source;
     }
 
     tick() {
-        source._invokeAllHandlers_();
+        this.source._invokeAllHandlers_();
     }
 
     loop(interval = 1) {
-        setInterval(() => source._invokeAllHandlers_(), interval);
+        setInterval(() => this.source._invokeAllHandlers_(), interval);
     }
 }
 
