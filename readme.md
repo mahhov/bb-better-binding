@@ -439,11 +439,20 @@ In the above example, the bad code lines won't work. When `initOptions` is invok
 
 It is possible to disable automatic binding triggering. This is useful when building an app that already has a "loop."
 
-```html
-
-```
+Usually, you'll use `let source = bb.boot(document.firstElementChild);` To disable automatic binding triggering, you should instead use `let source = bb.boot(document.firstElementChild, undefined, true);` To then trigger bindings manually, use `bb.tick()`. To enable automatic binding triggering at a later time, use `bb.loop()`.
 
 ```js
+let source = bb.boot(document.firstElementChild, undefined, true);
+
+source.yummyMenu = ['apple', 'blueberry', 'grapes', 'sunlight', 'canoe'];
+bb.tick();
+
+let newMenuItemsHandler = (...items) => {
+  source.yummyMenu.push(...items);
+  bb.tick();
+};
+
+menuItemsRepository.getMenuItemsEverySecond(newMenuItemsHandler);
 
 ```
 
