@@ -197,6 +197,8 @@ sets a field on source to the html element.
 
 element bindings are read only; e.g `source.playButton` and `source.audioBook` are not reassignable in the above example.
 
+optionally, you may wrap refferences to source elements in `getElem`. `source.inputs.name.firstNameInput.value` becomes `source.getElem('inputs.name.firstNameInput').value`. See the `Triggering Bindings` section on when this could be useful.
+
 ## utility expressions available by default for `bind-if` and `bind`
 
 `!`, `not`
@@ -387,15 +389,51 @@ The example above displays `hi there`. Modifying the field `flag` on object `sou
 
 By default bindings are triggered asynchroniously.
 
-This is fine because, except for element bindings, all other bindings are 1 way; modifying `source` updates the `html`, but user modifications to the `html` are projected to source either though event listeners or by element bindings. In order to make sure element bindings can be accessed syncrhoniously in your app, on fetching element bindings, all bindings queued to be triggered will trigger.
+This is fine because, except for element bindings, all other bindings are 1 way; modifying `source` updates the `html`, but user modifications to the `html` are projected to source either though event listeners or by element bindings. In order to make sure element bindings can be accessed syncrhoniously in your app, on fetching element bindings via `getElem`, all bindings queued to be triggered will trigger. This won't always be necessary.
 
 ```html
+<div bind-for="person in people"> 
+    <input bind-elem="person${index}Input"/>
+</div>
 
-```
+<div bind-for="option in options">
+    <input bind-elem="option${index}" type="radio" name="options">$s{option}
+</div>
+
+```  
 
 ```js
+let addPerson = defaultName => {
+    source.people.push(new Person(defaultName));
+    let index = source.people.length - 1;
+    
+    // bad code
+    source[`person${index}Input`].value = defaultName;
+    
+    // good code, alternative 1
+    source.getElem(`person${index}Input`).value = defaultName;
+    
+    // good code, alternative 2
+    source.getElem();
+    source[`person${index}Input`].value = defaultName;
+};
 
+let initOptions = () => {
+    source.options = ['rainbow', 'unicorn', 'moon candy', 'kitten hamburger', 'fluffy headless teddy'];
+    
+    // bad code
+    source.option0.checked = true;
+    
+    // good code, alternative 1
+    source.getElem('option0').checked = true;
+    
+    // goode code, alternative 2
+    source.getElem();
+    source.option0.checked = true;
+}
 ```
+
+In the above example, the bad code lines won't work. When `initOptions` is invoked, `source.options` is set. But because bindings are triggered asynchronously, the html input element is not yet created and the `source.option0` element reference does not yet exist. Invoking `source.getElem` grantees the html is updated before `source.option0` is accessed.
 
 ### 4
 

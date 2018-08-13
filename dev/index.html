@@ -1,3 +1,5 @@
-<div bind-block="myBlock with 'red', 'jacob'"></div>
+<div bind-for="option in options">
+    <input bind-elem="option${index}" type="radio" name="options">$s{option}
+</div>
 
 <script src="controller.js"></script>
