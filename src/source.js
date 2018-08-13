@@ -90,7 +90,7 @@ let setDefaultSource = source => {
     source['&&'] = source.and;
     source.getElem = elem => {
         source._invokeAllHandlers_();
-        return getValue(source, [elem]);
+        return elem && getValue(source, [elem]);
     }
 };
 
