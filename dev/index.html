@@ -1,5 +1,11 @@
-<div bind-for="option in options">
-    <input bind-elem="option${index}" type="radio" name="options">$s{option}
+<p>list</p>
+<div bind-for="line in lines">
+    <div bind-block="myBlock with line, 3"></div>
+</div>
+
+<p>function</p>
+<div bind-for="line in lines">
+    <div bind="func(line, 5)"></div>
 </div>
 
 <script src="controller.js"></script>

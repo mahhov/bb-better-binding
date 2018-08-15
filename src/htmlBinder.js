@@ -111,14 +111,15 @@ class HtmlBinder {
                     let [block, blockTo] = splitByWord(bindBlock, 'as');
                     let [blockName, paramsGroup] = splitByWord(block, 'with');
                     let paramsInput = paramsGroup ? splitByParams(paramsGroup) : [];
-                    let paramValues = this.getParamValues(paramsInput, elem);
+                    let params = paramsInput.map(param => translate(param, sourceLinks));
+                    let paramValues = this.getParamValues(params, elem);
                     let {template, controller, parameters} = this.blocks[blockName];
                     elem.removeAttribute('bind-block');
                     elem.innerHTML = template;
                     let {source: blockSource, handlers: blockHandlers} = new HtmlBinder(elem, this.blocks, this.source);
                     controller(blockSource);
                     parameters && parameters.forEach((to, index) => {
-                        let from = translate(paramsInput[index], sourceLinks);
+                        let from = params[index];
                         this.addPairBind(from, blockSource, to);
                         this.applyPairBind(from, blockSource, to);
                         blockSource[to] = paramValues[index];
